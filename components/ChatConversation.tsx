@@ -66,7 +66,7 @@ function UserBubble({ text, typing = false }: { text: string; typing?: boolean }
       initial={{ opacity: 0, scale: 0.95, y: 6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
-      className="ml-auto w-fit max-w-[90%] rounded-3xl bg-zinc-800 px-4 py-2.5 text-sm text-white"
+      className="w-fit max-w-[90%] rounded-3xl bg-zinc-800 px-4 py-2.5 text-sm text-white"
     >
       {text}
       {typing && (
@@ -263,55 +263,59 @@ export default function ChatConversation() {
             aria-hidden={!isActive && section.phase === "idle"}
           >
             <div
-              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col ${
-                section.id === "projects" ? "overflow-hidden" : "overflow-y-auto"
+              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center ${
+                section.id === "projects" ? "overflow-hidden" : ""
               }`}
             >
-              {showQuestion && (
-                <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
-                  {showResponse ? (
+              <div
+                className={`flex w-full flex-col ${
+                  section.id === "projects" ? "max-h-full overflow-hidden" : ""
+                }`}
+              >
+                {showQuestion && (
+                  <div className="mb-4 flex shrink-0 justify-end">
+                    {section.phase === "typing" ? (
+                      <UserBubble text={section.typedText} typing />
+                    ) : (
+                      <UserBubble text={section.question} />
+                    )}
+                  </div>
+                )}
+
+                {showResponse && (
+                  <div className="flex min-h-0 flex-col gap-3">
                     <AiAvatar />
-                  ) : (
-                    <div className="h-8 w-8 shrink-0" />
-                  )}
-                  {section.phase === "typing" ? (
-                    <UserBubble text={section.typedText} typing />
-                  ) : (
-                    <UserBubble text={section.question} />
-                  )}
-                </div>
-              )}
+                    <div className="min-w-0">
+                      <AnimatePresence mode="wait">
+                        {section.phase === "thinking" && (
+                          <motion.div
+                            key="thinking"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <ThinkingDots />
+                          </motion.div>
+                        )}
 
-              {showResponse && (
-                <div className="min-h-0 flex-1">
-                  <AnimatePresence mode="wait">
-                    {section.phase === "thinking" && (
-                      <motion.div
-                        key="thinking"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                      >
-                        <ThinkingDots />
-                      </motion.div>
-                    )}
-
-                    {section.isVisible && (
-                      <motion.div
-                        key="response"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.45,
-                          ease: [0.25, 0.1, 0.25, 1],
-                        }}
-                      >
-                        <ResponseContent sectionId={section.id} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
+                        {section.isVisible && (
+                          <motion.div
+                            key="response"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.45,
+                              ease: [0.25, 0.1, 0.25, 1],
+                            }}
+                          >
+                            <ResponseContent sectionId={section.id} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         );
