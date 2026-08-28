@@ -19,7 +19,7 @@ export interface ChatSectionConfig {
 }
 
 export const chatSections: ChatSectionConfig[] = [
-  { id: "intro", question: "Who is Bryan Chen?" },
+  { id: "intro", question: "Who are you?" },
   { id: "projects", question: "What projects have they built?" },
   { id: "skills", question: "What are their technical skills?" },
   { id: "contact", question: "How can I contact them?" },

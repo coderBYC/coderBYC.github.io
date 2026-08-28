@@ -3,52 +3,29 @@
 import Image from "next/image";
 import { skills } from "@/lib/data";
 
+const introBullets = [
+  "Sophomore at Umich",
+  "Mechanical Engineering major and minor in CS",
+  "Made in Taipei, Taiwan 🇹🇼",
+];
+
 export function IntroResponse() {
   return (
-    <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-4">
-          <h1 className="text-4xl tracking-wide text-black md:text-5xl">
-            Bryan Chen
-          </h1>
-          <Image
-            src="/umich.png"
-            alt="University of Michigan"
-            width={44}
-            height={44}
-            className="h-10 w-10 rounded-md object-cover"
-          />
-        </div>
-        <p className="text-lg text-black/55">
-          Mechanical Engineering Student at the University of Michigan
-        </p>
-        <div className="space-y-4 border-l border-black/15 pl-5">
-          <p className="text-sm uppercase tracking-[0.2em] text-black/40">
-            Who I Am
-          </p>
-          <p className="text-black/80">
-            Product Person / First Principles Thinker
-          </p>
-        </div>
-        <div className="space-y-4 border-l border-black/15 pl-5">
-          <p className="text-sm uppercase tracking-[0.2em] text-black/40">
-            I Like
-          </p>
-          <p className="text-black/60">
-            Politics, Aesthetics, Physics, Startups, and Engineering
-          </p>
-        </div>
-        <div className="space-y-3 pt-2">
-          <p className="text-xl leading-relaxed text-black/90">
-            I am a Sophomore Engineering student at the University of Michigan.
-          </p>
-          <p className="text-xl leading-relaxed text-black/50">
-            I am obsessed with building products that people want.
-          </p>
-        </div>
+    <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+      <div className="min-w-0 flex-1">
+        <p className="mb-4 text-lg text-black/90">I am Bryan Chen:</p>
+        <ul className="space-y-2 text-base text-black/65">
+          {introBullets.map((item) => (
+            <li key={item} className="flex gap-3">
+              <span className="text-black/30">—</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="flex justify-center md:justify-end">
-        <div className="relative h-56 w-56 overflow-hidden rounded-full border border-black/10 md:h-64 md:w-64">
+
+      <div className="flex shrink-0 justify-center md:justify-end">
+        <div className="relative h-40 w-40 overflow-hidden rounded-full border border-black/10 md:h-48 md:w-48">
           <Image
             src="/portrait.jpg"
             alt="Bryan Chen"
