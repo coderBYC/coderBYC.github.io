@@ -298,14 +298,6 @@ export default function ChatConversation() {
           );
         })}
       </div>
-
-      <footer className="border-t border-black/10 py-8">
-        <div className="mx-auto max-w-3xl px-6">
-          <p className="text-sm text-black/30">
-            © {new Date().getFullYear()} {SITE_NAME}
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
