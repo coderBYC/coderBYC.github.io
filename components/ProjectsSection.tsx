@@ -7,11 +7,11 @@ import { FiExternalLink, FiGithub } from "react-icons/fi";
 import TechPill from "./TechPill";
 import { projects, type Project } from "@/lib/data";
 
-interface ProjectTimelineItemProps {
+interface ProjectItemProps {
   project: Project;
 }
 
-function ProjectTimelineItem({ project }: ProjectTimelineItemProps) {
+function ProjectItem({ project }: ProjectItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -88,17 +88,13 @@ function ProjectTimelineItem({ project }: ProjectTimelineItemProps) {
   );
 }
 
-export default function Projects() {
+export default function ProjectsSection() {
   return (
-    <section id="projects" className="py-32 md:py-40">
-      <div className="mx-auto max-w-5xl px-6 md:px-8">
-        <h2 className="mb-20 text-sm uppercase tracking-[0.2em] text-black/40">
-          Projects
-        </h2>
-
+    <section id="projects" className="min-h-screen py-24">
+      <div className="mx-auto max-w-3xl px-6 md:px-8">
         <div className="flex flex-col">
           {projects.map((project) => (
-            <ProjectTimelineItem key={project.id} project={project} />
+            <ProjectItem key={project.id} project={project} />
           ))}
         </div>
       </div>

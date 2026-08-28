@@ -1,3 +1,14 @@
+export interface ChatSection {
+  id: string;
+  question: string;
+}
+
+export const chatSections: ChatSection[] = [
+  { id: "background", question: "Bryan's Background" },
+  { id: "projects", question: "Bryan's Past Projects" },
+  { id: "contact", question: "How to Contact Bryan" },
+];
+
 export interface Project {
   id: string;
   title: string;
@@ -60,12 +71,6 @@ export const projects: Project[] = [
     tech: ["JavaScript", "Python", "OpenAI API"],
     icon: "/projects/ai-quiz-generator.png",
   },
-];
-
-export const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
 ];
 
 export const contactLinks = [

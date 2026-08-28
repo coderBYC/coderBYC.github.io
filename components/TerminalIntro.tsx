@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COMMAND = "bryan_chen_website";
-const TYPING_DURATION_MS = 5000;
+const TYPING_DURATION_MS = 2000;
 
 interface TerminalIntroProps {
   onComplete: () => void;
