@@ -19,14 +19,14 @@ export default function Navbar() {
       transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "border-b border-white/10 bg-black/60 backdrop-blur-xl"
+          ? "border-b border-black/10 bg-white/70 backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5 md:px-8">
         <a
           href="#"
-          className="text-sm font-medium tracking-tight text-white transition-opacity hover:opacity-60"
+          className="text-sm font-medium tracking-tight text-black transition-opacity hover:opacity-60"
         >
           BC
         </a>
@@ -35,7 +35,7 @@ export default function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-sm text-white/60 transition-colors duration-300 hover:text-white"
+                className="text-sm text-black/60 transition-colors duration-300 hover:text-black"
               >
                 {link.label}
               </a>

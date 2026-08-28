@@ -44,7 +44,7 @@ export default function TechPill({ name }: TechPillProps) {
   const Icon = techIconMap[name];
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-xs text-white/60 transition-colors duration-300 hover:border-white/30 hover:text-white/80">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1 text-xs text-black/60 transition-colors duration-300 hover:border-black/30 hover:text-black/80">
       {Icon && <Icon className="h-3 w-3" />}
       {name}
     </span>

@@ -10,7 +10,7 @@ export default function Hero() {
         <div className="flex flex-col gap-8">
           <FadeIn>
             <div className="flex items-center gap-4">
-              <h1 className="text-5xl font-medium tracking-wide text-white md:text-7xl">
+              <h1 className="text-5xl font-medium tracking-wide text-black md:text-7xl">
                 Bryan Chen
               </h1>
               <Image
@@ -24,28 +24,28 @@ export default function Hero() {
           </FadeIn>
 
           <FadeIn delay={0.1}>
-            <p className="text-lg tracking-wide text-white/50 md:text-xl">
+            <p className="text-lg tracking-wide text-black/50 md:text-xl">
               Mechanical Engineering Student at the University of Michigan
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="flex flex-col gap-4 border-l border-white/20 pl-6">
-              <p className="text-sm uppercase tracking-[0.2em] text-white/40">
+            <div className="flex flex-col gap-4 border-l border-black/15 pl-6">
+              <p className="text-sm uppercase tracking-[0.2em] text-black/40">
                 Who I Am
               </p>
-              <p className="text-base tracking-wide text-white/80 md:text-lg">
+              <p className="text-base tracking-wide text-black/80 md:text-lg">
                 Product Person / First Principles Thinker
               </p>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.3}>
-            <div className="flex flex-col gap-4 border-l border-white/20 pl-6">
-              <p className="text-sm uppercase tracking-[0.2em] text-white/40">
+            <div className="flex flex-col gap-4 border-l border-black/15 pl-6">
+              <p className="text-sm uppercase tracking-[0.2em] text-black/40">
                 I Like
               </p>
-              <p className="text-base tracking-wide text-white/60 md:text-lg">
+              <p className="text-base tracking-wide text-black/60 md:text-lg">
                 Politics, Aesthetics, Physics, Startups, and Engineering
               </p>
             </div>
@@ -57,7 +57,7 @@ export default function Hero() {
           direction="right"
           className="flex justify-center md:justify-end"
         >
-          <div className="relative h-64 w-64 overflow-hidden rounded-full border border-white/10 md:h-80 md:w-80">
+          <div className="relative h-64 w-64 overflow-hidden rounded-full border border-black/10 md:h-80 md:w-80">
             <Image
               src="/portrait.jpg"
               alt="Bryan Chen"

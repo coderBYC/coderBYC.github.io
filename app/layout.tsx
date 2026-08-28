@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${instrumentSerif.variable} h-full scroll-smooth`}>
-      <body className="min-h-full bg-black font-serif text-white antialiased">
+      <body className="min-h-full bg-white font-serif text-black antialiased">
         {children}
       </body>
     </html>

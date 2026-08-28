@@ -11,33 +11,15 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: "ai-quiz-generator",
-    title: "AI Quiz Generator",
-    url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
-    date: "2025. June — 2025. Sep",
-    description: "Turn textbook into quizzes. My first project.",
-    tech: ["JavaScript", "Python", "OpenAI API"],
-    icon: "/projects/ai-quiz-generator.png",
-  },
-  {
-    id: "floatnote",
-    title: "FloatNote",
-    url: "https://chromewebstore.google.com/detail/floatnote-take-notes-ever/jkgdmffoghgihacnahgmbhoonabcifgm",
-    date: "2025. Dec — 2026. March",
+    id: "cortex-memory",
+    title: "Cortex Memory",
+    url: "https://github.com/coderBYC/Cortex-AI",
+    githubUrl: "https://github.com/coderBYC/Cortex-AI",
+    date: "2026. July —",
     description:
-      "Chrome extension for note taking. Highlight text and attach sticky notes directly on web pages.",
-    tech: ["JavaScript", "HTML", "CSS"],
-    icon: "/projects/floatnote.png",
-  },
-  {
-    id: "crumbo",
-    title: "Crumbo",
-    url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
-    date: "2026. March —",
-    description:
-      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
-    tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
-    icon: "/projects/crumbo.png",
+      "Solving agentic memory efficiency now. Building a local memory MCP for all agents, and a desktop app for users in the future.",
+    tech: ["Python", "SQLite", "FastEmbed", "MCP"],
+    icon: "/projects/cortex-memory.png",
   },
   {
     id: "snapcycle",
@@ -50,15 +32,33 @@ export const projects: Project[] = [
     icon: "/projects/snapcycle.png",
   },
   {
-    id: "cortex-memory",
-    title: "Cortex Memory",
-    url: "https://github.com/coderBYC/Cortex-AI",
-    githubUrl: "https://github.com/coderBYC/Cortex-AI",
-    date: "2026. July —",
+    id: "crumbo",
+    title: "Crumbo",
+    url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
+    date: "2026. March —",
     description:
-      "Solving agentic memory efficiency now. Building a local memory MCP for all agents, and a desktop app for users in the future.",
-    tech: ["Python", "SQLite", "FastEmbed", "MCP"],
-    icon: "/projects/cortex-memory.png",
+      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
+    tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
+    icon: "/projects/crumbo.png",
+  },
+  {
+    id: "floatnote",
+    title: "FloatNote",
+    url: "https://chromewebstore.google.com/detail/floatnote-take-notes-ever/jkgdmffoghgihacnahgmbhoonabcifgm",
+    date: "2025. Dec — 2026. March",
+    description:
+      "Chrome extension for note taking. Highlight text and attach sticky notes directly on web pages.",
+    tech: ["JavaScript", "HTML", "CSS"],
+    icon: "/projects/floatnote.png",
+  },
+  {
+    id: "ai-quiz-generator",
+    title: "AI Quiz Generator",
+    url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
+    date: "2025. June — 2025. Sep",
+    description: "Turn textbook into quizzes. My first project.",
+    tech: ["JavaScript", "Python", "OpenAI API"],
+    icon: "/projects/ai-quiz-generator.png",
   },
 ];
 

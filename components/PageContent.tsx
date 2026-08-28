@@ -39,9 +39,9 @@ export default function PageContent() {
           <Projects />
           <Contact />
         </main>
-        <footer className="border-t border-white/10 py-8">
+        <footer className="border-t border-black/10 py-8">
           <div className="mx-auto max-w-5xl px-6 md:px-8">
-            <p className="text-sm text-white/30">
+            <p className="text-sm text-black/30">
               © {new Date().getFullYear()} Bryan Chen
             </p>
           </div>
