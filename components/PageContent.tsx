@@ -9,12 +9,9 @@ import ProjectsSection from "./ProjectsSection";
 import ContactSection from "./ContactSection";
 import { chatSections } from "@/lib/data";
 
-const CONTENT_DELAY_MS = 350;
-
 export default function PageContent() {
   const [showIntro, setShowIntro] = useState(true);
-  const [revealedQuestions, setRevealedQuestions] = useState(0);
-  const [revealedContent, setRevealedContent] = useState(0);
+  const [triggeredCount, setTriggeredCount] = useState(0);
 
   useEffect(() => {
     document.body.style.overflow = showIntro ? "hidden" : "";
@@ -25,23 +22,15 @@ export default function PageContent() {
 
   useEffect(() => {
     if (showIntro) return;
-    setRevealedQuestions(1);
-    const timer = setTimeout(() => setRevealedContent(1), CONTENT_DELAY_MS);
-    return () => clearTimeout(timer);
+    setTriggeredCount(1);
   }, [showIntro]);
 
-  const handleSectionComplete = useCallback(
-    (index: number) => {
-      const next = index + 1;
-      if (next >= chatSections.length) return;
-
-      setRevealedQuestions((prev) => Math.max(prev, next + 1));
-      setTimeout(() => {
-        setRevealedContent((prev) => Math.max(prev, next + 1));
-      }, CONTENT_DELAY_MS);
-    },
-    []
-  );
+  const handleSectionComplete = useCallback((index: number) => {
+    const next = index + 1;
+    if (next < chatSections.length) {
+      setTriggeredCount((prev) => Math.max(prev, next + 1));
+    }
+  }, []);
 
   const sections = [
     <BackgroundSection key="background" />,
@@ -67,8 +56,7 @@ export default function PageContent() {
             <ChatTurn
               key={section.id}
               question={section.question}
-              showQuestion={revealedQuestions > index}
-              showContent={revealedContent > index}
+              isTriggered={triggeredCount > index}
               onSectionComplete={() => handleSectionComplete(index)}
               isLast={index === chatSections.length - 1}
             >
