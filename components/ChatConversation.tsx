@@ -214,7 +214,7 @@ export default function ChatConversation() {
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <div className="relative h-8 w-8 overflow-hidden rounded-full border border-black/10">
             <Image
-              src="/portrait.jpg"
+              src="/portrait.png"
               alt={SITE_NAME}
               fill
               className="object-cover object-top"
