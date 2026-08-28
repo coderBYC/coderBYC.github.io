@@ -6,36 +6,18 @@ export interface Project {
   date: string;
   description: string;
   tech: string[];
+  icon: string;
 }
 
 export const projects: Project[] = [
   {
-    id: "cortex-memory",
-    title: "Cortex Memory",
-    url: "https://github.com/coderBYC/Cortex-AI",
-    githubUrl: "https://github.com/coderBYC/Cortex-AI",
-    date: "2026. July —",
-    description:
-      "Solving agentic memory efficiency now. Building a local memory MCP for all agents, and a desktop app for users in the future.",
-    tech: ["Python", "SQLite", "FastEmbed", "MCP"],
-  },
-  {
-    id: "crumbo",
-    title: "Crumbo",
-    url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
-    date: "2026. March —",
-    description:
-      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
-    tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
-  },
-  {
-    id: "snapcycle",
-    title: "SnapCycle",
-    url: "https://devpost.com/software/rrr-s98zwc",
-    date: "2026. June",
-    description:
-      "Zero waste app that recycles your waste for you. Won Berkeley AI Hackathon 2026 Social Impact Track.",
-    tech: ["Python", "Redis", "Browserbase", "Gemini Multimodal API"],
+    id: "ai-quiz-generator",
+    title: "AI Quiz Generator",
+    url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
+    date: "2025. June — 2025. Sep",
+    description: "Turn textbook into quizzes. My first project.",
+    tech: ["JavaScript", "Python", "OpenAI API"],
+    icon: "/projects/ai-quiz-generator.png",
   },
   {
     id: "floatnote",
@@ -45,14 +27,38 @@ export const projects: Project[] = [
     description:
       "Chrome extension for note taking. Highlight text and attach sticky notes directly on web pages.",
     tech: ["JavaScript", "HTML", "CSS"],
+    icon: "/projects/floatnote.png",
   },
   {
-    id: "ai-quiz-generator",
-    title: "AI Quiz Generator",
-    url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
-    date: "2025. June — 2025. Sep",
-    description: "Turn textbook into quizzes. My first project.",
-    tech: ["JavaScript", "Python", "OpenAI API"],
+    id: "crumbo",
+    title: "Crumbo",
+    url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
+    date: "2026. March —",
+    description:
+      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
+    tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
+    icon: "/projects/crumbo.png",
+  },
+  {
+    id: "snapcycle",
+    title: "SnapCycle",
+    url: "https://devpost.com/software/rrr-s98zwc",
+    date: "2026. June",
+    description:
+      "Zero waste app that recycles your waste for you. Won Berkeley AI Hackathon 2026 Social Impact Track.",
+    tech: ["Python", "Redis", "Browserbase", "Gemini Multimodal API"],
+    icon: "/projects/snapcycle.png",
+  },
+  {
+    id: "cortex-memory",
+    title: "Cortex Memory",
+    url: "https://github.com/coderBYC/Cortex-AI",
+    githubUrl: "https://github.com/coderBYC/Cortex-AI",
+    date: "2026. July —",
+    description:
+      "Solving agentic memory efficiency now. Building a local memory MCP for all agents, and a desktop app for users in the future.",
+    tech: ["Python", "SQLite", "FastEmbed", "MCP"],
+    icon: "/projects/cortex-memory.png",
   },
 ];
 
