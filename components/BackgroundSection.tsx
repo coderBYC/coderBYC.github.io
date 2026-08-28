@@ -4,11 +4,8 @@ import Image from "next/image";
 
 export default function BackgroundSection() {
   return (
-    <section
-      id="background"
-      className="flex min-h-screen items-center py-24"
-    >
-      <div className="mx-auto grid w-full max-w-3xl grid-cols-1 items-center gap-16 px-6 md:grid-cols-2 md:px-8">
+    <section id="background" className="w-full">
+      <div className="grid w-full grid-cols-1 items-center gap-16 md:grid-cols-2">
         <div className="flex flex-col gap-8">
           <div className="flex items-center gap-4">
             <h1 className="text-5xl tracking-wide text-black md:text-6xl">

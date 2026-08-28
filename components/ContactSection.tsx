@@ -5,9 +5,8 @@ import { contactLinks } from "@/lib/data";
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="min-h-[70vh] py-24">
-      <div className="mx-auto max-w-3xl px-6 md:px-8">
-        <div className="flex flex-wrap gap-4">
+    <section id="contact" className="w-full">
+      <div className="flex flex-wrap gap-4">
           {contactLinks.map((link) => (
             <motion.a
               key={link.label}
@@ -24,7 +23,6 @@ export default function ContactSection() {
             </motion.a>
           ))}
         </div>
-      </div>
     </section>
   );
 }

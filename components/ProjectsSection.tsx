@@ -90,13 +90,11 @@ function ProjectItem({ project }: ProjectItemProps) {
 
 export default function ProjectsSection() {
   return (
-    <section id="projects" className="min-h-screen py-24">
-      <div className="mx-auto max-w-3xl px-6 md:px-8">
-        <div className="flex flex-col">
-          {projects.map((project) => (
-            <ProjectItem key={project.id} project={project} />
-          ))}
-        </div>
+    <section id="projects" className="w-full">
+      <div className="flex flex-col">
+        {projects.map((project) => (
+          <ProjectItem key={project.id} project={project} />
+        ))}
       </div>
     </section>
   );
