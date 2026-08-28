@@ -1,12 +1,28 @@
-export interface ChatSection {
+export type SectionPhase =
+  | "idle"
+  | "typing"
+  | "sent"
+  | "thinking"
+  | "visible";
+
+export interface ConversationSection {
+  id: string;
+  question: string;
+  phase: SectionPhase;
+  isTyping: boolean;
+  isVisible: boolean;
+}
+
+export interface ChatSectionConfig {
   id: string;
   question: string;
 }
 
-export const chatSections: ChatSection[] = [
-  { id: "background", question: "Bryan's Background" },
-  { id: "projects", question: "Bryan's Past Projects" },
-  { id: "contact", question: "How to Contact Bryan" },
+export const chatSections: ChatSectionConfig[] = [
+  { id: "intro", question: "Who is Bryan Chen?" },
+  { id: "projects", question: "What projects have they built?" },
+  { id: "skills", question: "What are their technical skills?" },
+  { id: "contact", question: "How can I contact them?" },
 ];
 
 export interface Project {
@@ -44,7 +60,7 @@ export const projects: Project[] = [
   },
   {
     id: "crumbo",
-    title: "Crumbo",
+    title: "Crumbo (Formally Let Him Cook)",
     url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
     date: "2026. March —",
     description:
@@ -73,17 +89,31 @@ export const projects: Project[] = [
   },
 ];
 
+export const skills = [
+  "Python",
+  "Swift",
+  "JavaScript",
+  "TypeScript",
+  "SQLite",
+  "Redis",
+  "Supabase",
+  "FastEmbed",
+  "MCP",
+  "Gemini API",
+  "OpenAI API",
+  "Browserbase",
+  "HTML",
+  "CSS",
+  "Render",
+];
+
 export const contactLinks = [
-  {
-    label: "GitHub",
-    href: "https://github.com/coderBYC",
-  },
+  { label: "GitHub", href: "https://github.com/coderBYC" },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/bryanchen",
+    href: "https://www.linkedin.com/in/bryan-chen-69b631302/",
   },
-  {
-    label: "Email",
-    href: "mailto:bryanchen@umich.edu",
-  },
+  { label: "Email", href: "mailto:bryanchen@umich.edu" },
 ];
+
+export const SITE_NAME = "Bryan Chen";
