@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { skills } from "@/lib/data";
 
 const introBullets = [
-  "Sophomore at Umich",
-  "Mechanical Engineering major and minor in CS",
+  "Sophomore at University of Michigan",
+  "Major in Mechanical Engineering, Minor in Computer Science",
   "Made in Taipei, Taiwan 🇹🇼",
 ];
 
@@ -27,7 +26,7 @@ export function IntroResponse() {
       <div className="flex shrink-0 justify-center md:justify-end">
         <div className="relative h-40 w-40 overflow-hidden rounded-full border border-black/10 md:h-48 md:w-48">
           <Image
-            src="/portrait.jpg"
+            src="/portrait.png"
             alt="Bryan Chen"
             fill
             className="object-cover object-top"
@@ -35,21 +34,6 @@ export function IntroResponse() {
           />
         </div>
       </div>
-    </div>
-  );
-}
-
-export function SkillsResponse() {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {skills.map((skill) => (
-        <span
-          key={skill}
-          className="rounded-full border border-black/15 px-4 py-2 text-sm text-black/70 transition-colors hover:border-black/30 hover:text-black"
-        >
-          {skill}
-        </span>
-      ))}
     </div>
   );
 }

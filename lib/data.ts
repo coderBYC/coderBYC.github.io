@@ -20,9 +20,8 @@ export interface ChatSectionConfig {
 
 export const chatSections: ChatSectionConfig[] = [
   { id: "intro", question: "Who are you?" },
-  { id: "projects", question: "What projects have they built?" },
-  { id: "skills", question: "What are their technical skills?" },
-  { id: "contact", question: "How can I contact them?" },
+  { id: "projects", question: "What projects have you built?" },
+  { id: "contact", question: "How can I contact you?" },
 ];
 
 export interface Project {
@@ -89,31 +88,14 @@ export const projects: Project[] = [
   },
 ];
 
-export const skills = [
-  "Python",
-  "Swift",
-  "JavaScript",
-  "TypeScript",
-  "SQLite",
-  "Redis",
-  "Supabase",
-  "FastEmbed",
-  "MCP",
-  "Gemini API",
-  "OpenAI API",
-  "Browserbase",
-  "HTML",
-  "CSS",
-  "Render",
-];
-
 export const contactLinks = [
-  { label: "GitHub", href: "https://github.com/coderBYC" },
+  { label: "X", href: "https://x.com/byc9487" },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/bryan-chen-69b631302/",
   },
-  { label: "Email", href: "mailto:bryanchen@umich.edu" },
+  { label: "GitHub", href: "https://github.com/coderBYC" },
+  { label: "Gmail", href: "mailto:bryanchen@umich.edu" },
 ];
 
 export const SITE_NAME = "Bryan Chen";

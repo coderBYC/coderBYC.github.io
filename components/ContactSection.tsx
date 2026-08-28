@@ -1,28 +1,42 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { FiGithub, FiLinkedin, FiMail } from "react-icons/fi";
+import { SiX } from "react-icons/si";
 import { contactLinks } from "@/lib/data";
+
+const iconMap = {
+  X: SiX,
+  LinkedIn: FiLinkedin,
+  GitHub: FiGithub,
+  Gmail: FiMail,
+} as const;
 
 export default function ContactSection() {
   return (
     <section id="contact" className="w-full">
-      <div className="flex flex-wrap gap-4">
-          {contactLinks.map((link) => (
-            <motion.a
-              key={link.label}
-              href={link.href}
-              target={link.href.startsWith("mailto") ? undefined : "_blank"}
-              rel={
-                link.href.startsWith("mailto") ? undefined : "noopener noreferrer"
-              }
-              className="inline-flex items-center justify-center rounded-full border border-black/30 px-8 py-3 text-sm text-black transition-all duration-300 hover:border-black hover:bg-black/5"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {link.label}
-            </motion.a>
-          ))}
-        </div>
+      <ul className="flex flex-col gap-4">
+        {contactLinks.map((link) => {
+          const Icon = iconMap[link.label as keyof typeof iconMap];
+
+          return (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                target={link.href.startsWith("mailto") ? undefined : "_blank"}
+                rel={
+                  link.href.startsWith("mailto")
+                    ? undefined
+                    : "noopener noreferrer"
+                }
+                className="group inline-flex items-center gap-3 text-black/70 transition-colors hover:text-black"
+              >
+                {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                <span className="text-sm tracking-wide">{link.label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

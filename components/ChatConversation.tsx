@@ -9,10 +9,9 @@ import {
 } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot } from "lucide-react";
 import ProjectsSection from "@/components/ProjectsSection";
 import ContactSection from "@/components/ContactSection";
-import { IntroResponse, SkillsResponse } from "@/components/chat/ChatResponses";
+import { IntroResponse } from "@/components/chat/ChatResponses";
 import {
   chatSections,
   SITE_NAME,
@@ -62,14 +61,6 @@ function ThinkingDots() {
   );
 }
 
-function AiAvatar() {
-  return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-black/10 bg-black/5">
-      <Bot className="h-4 w-4 text-black/60" strokeWidth={1.75} />
-    </div>
-  );
-}
-
 function UserBubble({ text, typing = false }: { text: string; typing?: boolean }) {
   return (
     <motion.div
@@ -94,7 +85,6 @@ function ResponseContent({ sectionId }: { sectionId: string }) {
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
     projects: <ProjectsSection />,
-    skills: <SkillsResponse />,
     contact: <ContactSection />,
   };
 
@@ -265,10 +255,8 @@ export default function ChatConversation() {
               )}
 
               {showResponse && (
-                <div className="flex items-start gap-3 md:gap-4">
-                  <AiAvatar />
-                  <div className="min-w-0 flex-1">
-                    <AnimatePresence mode="wait">
+                <div className="min-w-0">
+                  <AnimatePresence mode="wait">
                       {section.phase === "thinking" && (
                         <motion.div
                           key="thinking"
@@ -294,7 +282,6 @@ export default function ChatConversation() {
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
                 </div>
               )}
 
