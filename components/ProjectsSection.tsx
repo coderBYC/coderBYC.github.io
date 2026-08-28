@@ -7,12 +7,12 @@ import { FiArrowRight } from "react-icons/fi";
 import { projects } from "@/lib/data";
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.45,
+      duration: 0.35,
       ease: [0.25, 0.1, 0.25, 1] as const,
     },
   },
@@ -21,22 +21,22 @@ const cardVariants = {
 export default function ProjectsSection() {
   return (
     <section id="projects" className="w-full">
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
         {projects.map((project, index) => (
           <motion.div
             key={project.id}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
+            viewport={{ once: true, margin: "-20px" }}
             variants={cardVariants}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.05 }}
           >
             <Link
               href={`/projects/${project.id}`}
-              className="group block border-2 border-black bg-white p-5 shadow-[5px_5px_0_0_#000] transition-all duration-200 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0_0_#000] md:p-6"
+              className="group block border-2 border-black bg-white p-2.5 shadow-[3px_3px_0_0_#000] transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000]"
             >
-              <div className="flex items-start gap-4 md:gap-5">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden border-2 border-black shadow-[3px_3px_0_0_#000] md:h-16 md:w-16">
+              <div className="flex items-center gap-3">
+                <div className="relative h-9 w-9 shrink-0 overflow-hidden border-2 border-black shadow-[2px_2px_0_0_#000]">
                   <Image
                     src={project.icon}
                     alt={project.title}
@@ -46,18 +46,13 @@ export default function ProjectsSection() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs tracking-wide text-black/40 md:text-sm">
-                    {project.date}
-                  </p>
-                  <div className="mt-1 flex items-center justify-between gap-3">
-                    <h3 className="text-lg tracking-wide text-black md:text-xl">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="truncate text-sm tracking-wide text-black">
                       {project.title}
                     </h3>
-                    <FiArrowRight className="h-4 w-4 shrink-0 text-black/30 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-black" />
+                    <FiArrowRight className="h-3.5 w-3.5 shrink-0 text-black/30 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-black" />
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-black/55">
-                    {project.description}
-                  </p>
+                  <p className="truncate text-xs text-black/45">{project.date}</p>
                 </div>
               </div>
             </Link>

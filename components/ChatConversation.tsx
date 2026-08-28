@@ -94,6 +94,7 @@ function AiAvatar() {
 }
 
 function ResponseContent({ sectionId }: { sectionId: string }) {
+  const section = chatSections.find((s) => s.id === sectionId);
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
     projects: <ProjectsSection />,
@@ -102,6 +103,9 @@ function ResponseContent({ sectionId }: { sectionId: string }) {
 
   return (
     <div className="prose prose-neutral max-w-none prose-p:text-black/70 prose-headings:font-bold prose-headings:tracking-wide prose-headings:text-black">
+      {section?.introText && (
+        <p className="mb-4 text-base text-black/60">{section.introText}</p>
+      )}
       {content[sectionId]}
     </div>
   );
@@ -253,12 +257,23 @@ export default function ChatConversation() {
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
-            className="flex h-screen snap-start snap-always flex-col bg-white px-6 py-10 md:py-14"
+            className={`flex h-screen snap-start snap-always flex-col bg-white px-4 py-6 md:px-6 md:py-8 ${
+              section.id === "projects" ? "overflow-hidden" : ""
+            }`}
             aria-hidden={!isActive && section.phase === "idle"}
           >
-            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-y-auto">
+            <div
+              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col ${
+                section.id === "projects" ? "overflow-hidden" : "overflow-y-auto"
+              }`}
+            >
               {showQuestion && (
-                <div className="mb-8 flex shrink-0 justify-end">
+                <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
+                  {showResponse ? (
+                    <AiAvatar />
+                  ) : (
+                    <div className="h-8 w-8 shrink-0" />
+                  )}
                   {section.phase === "typing" ? (
                     <UserBubble text={section.typedText} typing />
                   ) : (
@@ -268,9 +283,7 @@ export default function ChatConversation() {
               )}
 
               {showResponse && (
-                <div className="flex min-h-0 flex-1 items-start gap-3 md:gap-4">
-                  <AiAvatar />
-                  <div className="min-w-0 flex-1">
+                <div className="min-h-0 flex-1">
                   <AnimatePresence mode="wait">
                     {section.phase === "thinking" && (
                       <motion.div
@@ -297,7 +310,6 @@ export default function ChatConversation() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  </div>
                 </div>
               )}
             </div>

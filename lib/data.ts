@@ -16,12 +16,21 @@ export interface ConversationSection {
 export interface ChatSectionConfig {
   id: string;
   question: string;
+  introText?: string;
 }
 
 export const chatSections: ChatSectionConfig[] = [
   { id: "intro", question: "Who are you?" },
-  { id: "projects", question: "What projects have you built?" },
-  { id: "contact", question: "How can I contact you?" },
+  {
+    id: "projects",
+    question: "What projects have you built?",
+    introText: "These are my past projects, spanning from agents to design",
+  },
+  {
+    id: "contact",
+    question: "How can I contact you?",
+    introText: "Here is my contact information:",
+  },
 ];
 
 export interface Project {
