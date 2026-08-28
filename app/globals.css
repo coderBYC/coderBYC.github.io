@@ -8,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
+  --font-serif: var(--font-cardo), "Times New Roman", serif;
 }
 
 html {
@@ -18,9 +18,8 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
-  letter-spacing: 0.03em;
-  font-stretch: 110%;
+  font-family: var(--font-serif);
+  font-weight: 700;
 }
 
 ::selection {

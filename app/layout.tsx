@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Cardo } from "next/font/google";
 import "./globals.css";
 
-const instrumentSans = Instrument_Sans({
+const cardo = Cardo({
   subsets: ["latin"],
-  variable: "--font-instrument-sans",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cardo",
   display: "swap",
 });
 
@@ -22,8 +24,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${instrumentSans.variable} h-full scroll-smooth`}>
-      <body className="min-h-full bg-white font-sans text-black antialiased">
+    <html lang="en" className={`${cardo.variable} h-full scroll-smooth`}>
+      <body className="min-h-full bg-white font-serif font-bold text-black antialiased">
         {children}
       </body>
     </html>

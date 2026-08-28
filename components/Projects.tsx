@@ -2,11 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import {
-  motion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { FiExternalLink, FiGithub } from "react-icons/fi";
 import TechPill from "./TechPill";
 import { projects, type Project } from "@/lib/data";
@@ -41,14 +37,12 @@ function ProjectTimelineItem({ project }: ProjectTimelineItemProps) {
           />
         </div>
 
-        <div className="relative min-w-0 flex-1 border-l border-black/10 pl-6 md:pl-10">
-          <div className="absolute -left-[5px] top-2 h-[9px] w-[9px] rounded-full border border-black/30 bg-white md:-left-[6px] md:h-[11px] md:w-[11px]" />
-
+        <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-4">
             <p className="text-sm tracking-wide text-black/40">{project.date}</p>
 
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-xl font-medium tracking-wide text-black md:text-2xl">
+              <h3 className="text-xl tracking-wide text-black md:text-2xl">
                 {project.title}
               </h3>
               {project.url && (
@@ -102,14 +96,10 @@ export default function Projects() {
           Projects
         </h2>
 
-        <div className="relative">
-          <div className="absolute top-0 bottom-0 left-[4.75rem] w-px bg-black/10 md:left-[7rem]" />
-
-          <div className="flex flex-col">
-            {projects.map((project) => (
-              <ProjectTimelineItem key={project.id} project={project} />
-            ))}
-          </div>
+        <div className="flex flex-col">
+          {projects.map((project) => (
+            <ProjectTimelineItem key={project.id} project={project} />
+          ))}
         </div>
       </div>
     </section>
