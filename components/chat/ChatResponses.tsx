@@ -12,7 +12,7 @@ export function IntroResponse() {
   return (
     <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0 flex-1">
-        <p className="mb-4 text-lg text-black/90">I am Bryan Chen:</p>
+        <p className="mb-4 text-lg text-black/90">👋 Hi, I'm Bryan Chen:</p>
         <ul className="space-y-2 text-base text-black/65">
           {introBullets.map((item) => (
             <li key={item} className="flex gap-3">

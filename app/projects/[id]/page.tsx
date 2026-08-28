@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { FiArrowLeft, FiExternalLink, FiGithub } from "react-icons/fi";
 import TechPill from "@/components/TechPill";
 import { getAllProjectIds, getProjectById } from "@/lib/projects";
-import { SITE_NAME } from "@/lib/data";
 
 export function generateStaticParams() {
   return getAllProjectIds().map((id) => ({ id }));
@@ -86,10 +85,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             )}
           </div>
         </article>
-
-        <p className="mt-12 text-sm text-black/30">
-          © {new Date().getFullYear()} {SITE_NAME}
-        </p>
       </div>
     </main>
   );

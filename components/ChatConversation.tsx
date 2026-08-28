@@ -95,12 +95,30 @@ function ResponseContent({ sectionId }: { sectionId: string }) {
   );
 }
 
+function SlideHeader() {
+  return (
+    <header className="shrink-0 border-b border-black/10 bg-white/90 px-6 py-4 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-3xl items-center gap-3">
+        <div className="relative h-8 w-8 overflow-hidden rounded-full border border-black/10">
+          <Image
+            src="/portrait.png"
+            alt={SITE_NAME}
+            fill
+            className="object-cover object-top"
+          />
+        </div>
+        <p className="text-sm font-bold text-black">ChenGPT</p>
+      </div>
+    </header>
+  );
+}
+
 export default function ChatConversation() {
   const [sections, setSections] = useState<SectionState[]>(createInitialSections);
+  const [activeSlide, setActiveSlide] = useState(0);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const sentinelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const scrollTriggeredRef = useRef<Set<number>>(new Set());
-  const startedRef = useRef(false);
+  const slideRefs = useRef<(HTMLElement | null)[]>([]);
+  const triggeredRef = useRef<Set<number>>(new Set());
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -174,78 +192,81 @@ export default function ChatConversation() {
     [clearTimers, patchSection]
   );
 
+  const triggerSlide = useCallback(
+    (index: number) => {
+      if (triggeredRef.current.has(index)) return;
+      triggeredRef.current.add(index);
+      runSectionSequence(index);
+    },
+    [runSectionSequence]
+  );
+
   useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-    runSectionSequence(0);
+    triggerSlide(0);
     return clearTimers;
-  }, [runSectionSequence, clearTimers]);
+  }, [triggerSlide, clearTimers]);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
 
-    sections.forEach((section, index) => {
-      if (section.phase !== "visible" || index >= sections.length - 1) return;
-
-      const sentinel = sentinelRefs.current[index];
-      if (!sentinel) return;
+    chatSections.forEach((_, index) => {
+      const slide = slideRefs.current[index];
+      if (!slide) return;
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (!entry.isIntersecting) return;
-          if (scrollTriggeredRef.current.has(index)) return;
+          if (!entry.isIntersecting || entry.intersectionRatio < 0.55) return;
 
-          scrollTriggeredRef.current.add(index);
-          runSectionSequence(index + 1);
+          setActiveSlide(index);
+          triggerSlide(index);
         },
-        { threshold: 0.85, rootMargin: "0px 0px -5% 0px" }
+        { threshold: [0.55, 0.75, 0.9] }
       );
 
-      observer.observe(sentinel);
+      observer.observe(slide);
       observers.push(observer);
     });
 
     return () => observers.forEach((observer) => observer.disconnect());
-  }, [sections, runSectionSequence]);
+  }, [triggerSlide]);
 
   return (
-    <div className="relative min-h-screen bg-white pb-16">
-      <header className="sticky top-0 z-40 border-b border-black/10 bg-white/80 px-6 py-4 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
-          <div className="relative h-8 w-8 overflow-hidden rounded-full border border-black/10">
-            <Image
-              src="/portrait.png"
-              alt={SITE_NAME}
-              fill
-              className="object-cover object-top"
-            />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-black">{SITE_NAME}</p>
-            <p className="text-xs text-black/45">Portfolio Assistant</p>
-          </div>
-        </div>
-      </header>
+    <div className="fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none">
+      {sections.map((section, index) => {
+        const showQuestion =
+          section.phase === "typing" ||
+          section.phase === "sent" ||
+          section.phase === "thinking" ||
+          section.phase === "visible";
 
-      <div className="mx-auto max-w-3xl space-y-16 px-6 py-10 md:py-14">
-        {sections.map((section, index) => {
-          if (section.phase === "idle") return null;
+        const showResponse =
+          section.phase === "sent" ||
+          section.phase === "thinking" ||
+          section.phase === "visible";
 
-          const showQuestion =
-            section.phase === "typing" ||
-            section.phase === "sent" ||
-            section.phase === "thinking" ||
-            section.phase === "visible";
+        const isActive = activeSlide === index;
 
-          const showResponse =
-            section.phase === "sent" ||
-            section.phase === "thinking" ||
-            section.phase === "visible";
+        return (
+          <section
+            key={section.id}
+            ref={(el) => {
+              slideRefs.current[index] = el;
+            }}
+            className="flex h-screen snap-start snap-always flex-col bg-white"
+            aria-hidden={!isActive && section.phase === "idle"}
+          >
+            <SlideHeader />
 
-          return (
-            <article key={section.id} className="space-y-5">
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-y-auto px-6 py-8">
               {showQuestion && (
-                <div className="flex justify-end">
+                <div className="mb-8 flex shrink-0 justify-end">
                   {section.phase === "typing" ? (
                     <UserBubble text={section.typedText} typing />
                   ) : (
@@ -255,49 +276,39 @@ export default function ChatConversation() {
               )}
 
               {showResponse && (
-                <div className="min-w-0">
+                <div className="min-h-0 flex-1">
                   <AnimatePresence mode="wait">
-                      {section.phase === "thinking" && (
-                        <motion.div
-                          key="thinking"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <ThinkingDots />
-                        </motion.div>
-                      )}
+                    {section.phase === "thinking" && (
+                      <motion.div
+                        key="thinking"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <ThinkingDots />
+                      </motion.div>
+                    )}
 
-                      {section.isVisible && (
-                        <motion.div
-                          key="response"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.45,
-                            ease: [0.25, 0.1, 0.25, 1],
-                          }}
-                        >
-                          <ResponseContent sectionId={section.id} />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {section.isVisible && (
+                      <motion.div
+                        key="response"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.45,
+                          ease: [0.25, 0.1, 0.25, 1],
+                        }}
+                      >
+                        <ResponseContent sectionId={section.id} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
-
-              {section.isVisible && index < sections.length - 1 && (
-                <div
-                  ref={(el) => {
-                    sentinelRefs.current[index] = el;
-                  }}
-                  className="h-px w-full"
-                  aria-hidden
-                />
-              )}
-            </article>
-          );
-        })}
-      </div>
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
