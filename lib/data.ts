@@ -1,0 +1,78 @@
+export interface Project {
+  id: string;
+  title: string;
+  url?: string;
+  githubUrl?: string;
+  date: string;
+  description: string;
+  tech: string[];
+}
+
+export const projects: Project[] = [
+  {
+    id: "cortex-memory",
+    title: "Cortex Memory",
+    url: "https://github.com/coderBYC/Cortex-AI",
+    githubUrl: "https://github.com/coderBYC/Cortex-AI",
+    date: "2026. July —",
+    description:
+      "Solving agentic memory efficiency now. Building a local memory MCP for all agents, and a desktop app for users in the future.",
+    tech: ["Python", "SQLite", "FastEmbed", "MCP"],
+  },
+  {
+    id: "crumbo",
+    title: "Crumbo",
+    url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
+    date: "2026. March —",
+    description:
+      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
+    tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
+  },
+  {
+    id: "snapcycle",
+    title: "SnapCycle",
+    url: "https://devpost.com/software/rrr-s98zwc",
+    date: "2026. June",
+    description:
+      "Zero waste app that recycles your waste for you. Won Berkeley AI Hackathon 2026 Social Impact Track.",
+    tech: ["Python", "Redis", "Browserbase", "Gemini Multimodal API"],
+  },
+  {
+    id: "floatnote",
+    title: "FloatNote",
+    url: "https://chromewebstore.google.com/detail/floatnote-take-notes-ever/jkgdmffoghgihacnahgmbhoonabcifgm",
+    date: "2025. Dec — 2026. March",
+    description:
+      "Chrome extension for note taking. Highlight text and attach sticky notes directly on web pages.",
+    tech: ["JavaScript", "HTML", "CSS"],
+  },
+  {
+    id: "ai-quiz-generator",
+    title: "AI Quiz Generator",
+    url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
+    date: "2025. June — 2025. Sep",
+    description: "Turn textbook into quizzes. My first project.",
+    tech: ["JavaScript", "Python", "OpenAI API"],
+  },
+];
+
+export const navLinks = [
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Contact", href: "#contact" },
+];
+
+export const contactLinks = [
+  {
+    label: "GitHub",
+    href: "https://github.com/coderBYC",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/bryanchen",
+  },
+  {
+    label: "Email",
+    href: "mailto:bryanchen@umich.edu",
+  },
+];
