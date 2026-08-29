@@ -3,6 +3,7 @@
 import { FiGithub, FiLinkedin, FiMail } from "react-icons/fi";
 import { SiX } from "react-icons/si";
 import { contactLinks } from "@/lib/data";
+import { RevealLine } from "@/components/chat/RevealLine";
 
 const iconMap = {
   X: SiX,
@@ -11,29 +12,31 @@ const iconMap = {
   Gmail: FiMail,
 } as const;
 
-export default function ContactSection() {
+export default function ContactSection({ lineOffset = 0 }: { lineOffset?: number }) {
   return (
     <section id="contact" className="w-full">
       <ul className="flex flex-col gap-4">
-        {contactLinks.map((link) => {
+        {contactLinks.map((link, index) => {
           const Icon = iconMap[link.label as keyof typeof iconMap];
 
           return (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                target={link.href.startsWith("mailto") ? undefined : "_blank"}
-                rel={
-                  link.href.startsWith("mailto")
-                    ? undefined
-                    : "noopener noreferrer"
-                }
-                className="group inline-flex items-center gap-3 text-black/70 transition-colors hover:text-black"
-              >
-                {Icon && <Icon className="h-4 w-4 shrink-0" />}
-                <span className="text-sm tracking-wide">{link.label}</span>
-              </a>
-            </li>
+            <RevealLine key={link.label} index={lineOffset + index}>
+              <li>
+                <a
+                  href={link.href}
+                  target={link.href.startsWith("mailto") ? undefined : "_blank"}
+                  rel={
+                    link.href.startsWith("mailto")
+                      ? undefined
+                      : "noopener noreferrer"
+                  }
+                  className="group inline-flex items-center gap-3 text-black/70 transition-colors hover:text-black"
+                >
+                  {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                  <span className="text-sm tracking-wide">{link.label}</span>
+                </a>
+              </li>
+            </RevealLine>
           );
         })}
       </ul>

@@ -24,7 +24,7 @@ export const chatSections: ChatSectionConfig[] = [
   {
     id: "projects",
     question: "What projects have you built?",
-    introText: "These are my past projects, spanning from agents to design",
+    introText: "These are my past projects, spanning from agents to design:",
   },
   {
     id: "contact",

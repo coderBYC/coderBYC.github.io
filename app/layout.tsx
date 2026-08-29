@@ -19,6 +19,21 @@ export const metadata: Metadata = {
     description:
       "Mechanical Engineering student at the University of Michigan. Building products that people want.",
     type: "website",
+    images: [
+      {
+        url: "/portrait.png",
+        width: 1200,
+        height: 1200,
+        alt: "Bryan Chen",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Bryan Chen",
+    description:
+      "Mechanical Engineering student at the University of Michigan. Building products that people want.",
+    images: ["/portrait.png"],
   },
 };
 

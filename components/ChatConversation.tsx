@@ -9,16 +9,21 @@ import {
 } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiArrowRight } from "react-icons/fi";
 import ProjectsSection from "@/components/ProjectsSection";
 import ContactSection from "@/components/ContactSection";
 import { IntroResponse } from "@/components/chat/ChatResponses";
+import { RevealLine, revealCompleteMs } from "@/components/chat/RevealLine";
 import {
   chatSections,
+  contactLinks,
+  projects,
   type SectionPhase,
 } from "@/lib/data";
 
 const THINK_MS = 1000;
 const SEND_MS = 300;
+const PROMPT_TYPE_MS = 1800;
 
 interface SectionState {
   id: string;
@@ -27,6 +32,13 @@ interface SectionState {
   typedText: string;
   isTyping: boolean;
   isVisible: boolean;
+}
+
+interface PromptBarState {
+  hostSlideIndex: number;
+  text: string;
+  isTyping: boolean;
+  canSend: boolean;
 }
 
 function createInitialSections(): SectionState[] {
@@ -82,29 +94,114 @@ function UserBubble({ text, typing = false }: { text: string; typing?: boolean }
 
 function AiAvatar() {
   return (
-    <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-black/10">
-      <Image
-        src="/portrait.png"
-        alt="Bryan Chen"
-        fill
-        className="object-cover object-top"
-      />
+    <div className="flex items-center gap-2.5">
+      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-black/10">
+        <Image
+          src="/portrait.png"
+          alt="Bryan Chen"
+          fill
+          className="object-cover object-top"
+        />
+      </div>
+      <span className="text-sm tracking-wide text-black">coderBYC</span>
     </div>
   );
 }
 
-function ResponseContent({ sectionId }: { sectionId: string }) {
+function PromptBar({
+  text,
+  isTyping,
+  canSend,
+  onSend,
+}: {
+  text: string;
+  isTyping: boolean;
+  canSend: boolean;
+  onSend: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      className="shrink-0 px-4 pb-6 pt-3 md:px-6 md:pb-8"
+    >
+      <div className="mx-auto flex max-w-3xl items-center gap-2 rounded-3xl border-2 border-black bg-white px-4 py-2.5">
+        <span className="min-h-5 flex-1 text-sm text-black">
+          {text}
+          {isTyping && (
+            <motion.span
+              className="ml-0.5 inline-block h-4 w-0.5 translate-y-0.5 bg-black/50"
+              animate={{ opacity: [1, 0] }}
+              transition={{ duration: 0.55, repeat: Infinity }}
+            />
+          )}
+        </span>
+        <button
+          type="button"
+          onClick={onSend}
+          disabled={!canSend}
+          aria-label="Send prompt"
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
+            canSend
+              ? "border-black bg-black text-white hover:bg-black/90"
+              : "cursor-not-allowed border-black/20 text-black/25"
+          }`}
+        >
+          <FiArrowRight className="h-4 w-4" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+function getLineCount(sectionId: string): number {
+  switch (sectionId) {
+    case "intro":
+      return 5;
+    case "projects":
+      return 1 + projects.length;
+    case "contact":
+      return 1 + contactLinks.length;
+    default:
+      return 1;
+  }
+}
+
+function ResponseContent({
+  sectionId,
+  slideIndex,
+  onContentComplete,
+}: {
+  sectionId: string;
+  slideIndex: number;
+  onContentComplete: (index: number) => void;
+}) {
   const section = chatSections.find((s) => s.id === sectionId);
+  const hasIntroText = Boolean(section?.introText);
+  const contentLineOffset = hasIntroText ? 1 : 0;
+  const onCompleteRef = useRef(onContentComplete);
+  onCompleteRef.current = onContentComplete;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onCompleteRef.current(slideIndex);
+    }, revealCompleteMs(getLineCount(sectionId)));
+    return () => clearTimeout(timer);
+  }, [sectionId, slideIndex]);
+
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
-    projects: <ProjectsSection />,
-    contact: <ContactSection />,
+    projects: <ProjectsSection lineOffset={contentLineOffset} />,
+    contact: <ContactSection lineOffset={contentLineOffset} />,
   };
 
   return (
     <div className="prose prose-neutral max-w-none prose-p:text-black/70 prose-headings:font-bold prose-headings:tracking-wide prose-headings:text-black">
       {section?.introText && (
-        <p className="mb-4 text-base text-black/60">{section.introText}</p>
+        <RevealLine index={0}>
+          <p className="mb-4 text-base text-black/60">{section.introText}</p>
+        </RevealLine>
       )}
       {content[sectionId]}
     </div>
@@ -114,13 +211,21 @@ function ResponseContent({ sectionId }: { sectionId: string }) {
 export default function ChatConversation() {
   const [sections, setSections] = useState<SectionState[]>(createInitialSections);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [maxUnlockedSlide, setMaxUnlockedSlide] = useState(0);
+  const [promptBar, setPromptBar] = useState<PromptBarState | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
-  const triggeredRef = useRef<Set<number>>(new Set());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const promptStartedRef = useRef<Set<number>>(new Set());
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
+    if (promptIntervalRef.current) {
+      clearInterval(promptIntervalRef.current);
+      promptIntervalRef.current = null;
+    }
   }, []);
 
   const patchSection = useCallback(
@@ -134,7 +239,7 @@ export default function ChatConversation() {
     []
   );
 
-  const runSectionSequence = useCallback(
+  const runAutoSequence = useCallback(
     (index: number) => {
       const question = chatSections[index]?.question;
       if (!question) return;
@@ -190,19 +295,107 @@ export default function ChatConversation() {
     [clearTimers, patchSection]
   );
 
-  const triggerSlide = useCallback(
+  const runFromSend = useCallback(
     (index: number) => {
-      if (triggeredRef.current.has(index)) return;
-      triggeredRef.current.add(index);
-      runSectionSequence(index);
+      const question = chatSections[index]?.question;
+      if (!question) return;
+
+      clearTimers();
+      patchSection(index, {
+        phase: "sent",
+        isTyping: false,
+        isVisible: false,
+        typedText: question,
+      });
+
+      const thinkTimer = setTimeout(() => {
+        patchSection(index, { phase: "thinking" });
+
+        const visibleTimer = setTimeout(() => {
+          patchSection(index, {
+            phase: "visible",
+            isVisible: true,
+          });
+        }, THINK_MS);
+
+        timersRef.current.push(visibleTimer);
+      }, SEND_MS);
+
+      timersRef.current.push(thinkTimer);
     },
-    [runSectionSequence]
+    [clearTimers, patchSection]
+  );
+
+  const startPromptBarTyping = useCallback((hostSlideIndex: number) => {
+    const question = chatSections[hostSlideIndex + 1]?.question;
+    if (!question) return;
+
+    if (promptIntervalRef.current) {
+      clearInterval(promptIntervalRef.current);
+    }
+
+    setPromptBar({
+      hostSlideIndex,
+      text: "",
+      isTyping: true,
+      canSend: false,
+    });
+
+    const charDelay = Math.min(
+      55,
+      Math.max(28, Math.floor(PROMPT_TYPE_MS / question.length))
+    );
+
+    let charIndex = 0;
+    promptIntervalRef.current = setInterval(() => {
+      charIndex += 1;
+      const text = question.slice(0, charIndex);
+
+      setPromptBar({
+        hostSlideIndex,
+        text,
+        isTyping: charIndex < question.length,
+        canSend: charIndex >= question.length,
+      });
+
+      if (charIndex >= question.length && promptIntervalRef.current) {
+        clearInterval(promptIntervalRef.current);
+        promptIntervalRef.current = null;
+      }
+    }, charDelay);
+  }, []);
+
+  const handlePromptSend = useCallback(() => {
+    if (!promptBar?.canSend) return;
+
+    const nextIndex = promptBar.hostSlideIndex + 1;
+    setPromptBar(null);
+
+    if (promptIntervalRef.current) {
+      clearInterval(promptIntervalRef.current);
+      promptIntervalRef.current = null;
+    }
+
+    setMaxUnlockedSlide(nextIndex);
+    setActiveSlide(nextIndex);
+    slideRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth" });
+    runFromSend(nextIndex);
+  }, [promptBar, runFromSend]);
+
+  const handleContentComplete = useCallback(
+    (index: number) => {
+      if (index >= chatSections.length - 1) return;
+      if (promptStartedRef.current.has(index)) return;
+      promptStartedRef.current.add(index);
+      startPromptBarTyping(index);
+    },
+    [startPromptBarTyping]
   );
 
   useEffect(() => {
-    triggerSlide(0);
+    runAutoSequence(0);
     return clearTimers;
-  }, [triggerSlide, clearTimers]);
+  }, [runAutoSequence, clearTimers]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -212,31 +405,41 @@ export default function ChatConversation() {
   }, []);
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-    chatSections.forEach((_, index) => {
-      const slide = slideRefs.current[index];
-      if (!slide) return;
+    const handleScroll = () => {
+      const index = Math.round(container.scrollTop / container.clientHeight);
+      const clamped = Math.min(index, maxUnlockedSlide);
+      setActiveSlide(clamped);
 
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting || entry.intersectionRatio < 0.55) return;
+      if (index > maxUnlockedSlide) {
+        slideRefs.current[maxUnlockedSlide]?.scrollIntoView({
+          behavior: "smooth",
+        });
+      }
+    };
 
-          setActiveSlide(index);
-          triggerSlide(index);
-        },
-        { threshold: [0.55, 0.75, 0.9] }
-      );
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [maxUnlockedSlide]);
 
-      observer.observe(slide);
-      observers.push(observer);
-    });
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Enter" || !promptBar?.canSend) return;
+      event.preventDefault();
+      handlePromptSend();
+    };
 
-    return () => observers.forEach((observer) => observer.disconnect());
-  }, [triggerSlide]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [promptBar, handlePromptSend]);
 
   return (
-    <div className="fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none">
+    <div
+      ref={scrollContainerRef}
+      className="fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none"
+    >
       {sections.map((section, index) => {
         const showQuestion =
           section.phase === "typing" ||
@@ -250,6 +453,8 @@ export default function ChatConversation() {
           section.phase === "visible";
 
         const isActive = activeSlide === index;
+        const showPromptBar =
+          promptBar?.hostSlideIndex === index && section.phase === "visible";
 
         return (
           <section
@@ -257,19 +462,19 @@ export default function ChatConversation() {
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
-            className={`flex h-screen snap-start snap-always flex-col bg-white px-4 py-6 md:px-6 md:py-8 ${
-              section.id === "projects" ? "overflow-hidden" : ""
-            }`}
+            className="flex h-screen snap-start snap-always flex-col bg-white"
             aria-hidden={!isActive && section.phase === "idle"}
           >
             <div
-              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center ${
-                section.id === "projects" ? "overflow-hidden" : ""
+              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-6 md:px-6 md:py-8 ${
+                section.id === "projects"
+                  ? "min-h-0 overflow-visible py-2"
+                  : "overflow-hidden"
               }`}
             >
               <div
                 className={`flex w-full flex-col ${
-                  section.id === "projects" ? "max-h-full overflow-hidden" : ""
+                  section.id === "projects" ? "overflow-visible" : ""
                 }`}
               >
                 {showQuestion && (
@@ -299,17 +504,13 @@ export default function ChatConversation() {
                         )}
 
                         {section.isVisible && (
-                          <motion.div
-                            key="response"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{
-                              duration: 0.45,
-                              ease: [0.25, 0.1, 0.25, 1],
-                            }}
-                          >
-                            <ResponseContent sectionId={section.id} />
-                          </motion.div>
+                          <div>
+                            <ResponseContent
+                              sectionId={section.id}
+                              slideIndex={index}
+                              onContentComplete={handleContentComplete}
+                            />
+                          </div>
                         )}
                       </AnimatePresence>
                     </div>
@@ -317,6 +518,15 @@ export default function ChatConversation() {
                 )}
               </div>
             </div>
+
+            {showPromptBar && (
+              <PromptBar
+                text={promptBar.text}
+                isTyping={promptBar.isTyping}
+                canSend={promptBar.canSend}
+                onSend={handlePromptSend}
+              />
+            )}
           </section>
         );
       })}
