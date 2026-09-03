@@ -3,7 +3,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { FiArrowLeft, FiExternalLink, FiGithub } from "react-icons/fi";
 import TechPill from "@/components/TechPill";
+import ProjectPhaseContent from "@/components/ProjectPhaseContent";
 import { getAllProjectIds, getProjectById } from "@/lib/projects";
+import { projectPhases } from "@/lib/project-content";
 
 export function generateStaticParams() {
   return getAllProjectIds().map((id) => ({ id }));
@@ -21,6 +23,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
+  const phases = projectPhases[id];
+
   return (
     <main className="min-h-screen bg-white px-6 py-12 md:px-8 md:py-16">
       <div className="mx-auto max-w-3xl">
@@ -34,12 +38,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <article className="border-2 border-black bg-white p-6 shadow-[8px_8px_0_0_#000] md:p-8">
           <div className="mb-8 flex items-start gap-5">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden border-2 border-black shadow-[3px_3px_0_0_#000] md:h-20 md:w-20">
+            <div
+              className={`relative h-16 w-16 shrink-0 overflow-hidden md:h-20 md:w-20 ${
+                id === "cortex-memory"
+                  ? ""
+                  : "border-2 border-black shadow-[3px_3px_0_0_#000]"
+              }`}
+            >
               <Image
                 src={project.icon}
                 alt={project.title}
                 fill
-                className="object-cover"
+                className={id === "cortex-memory" ? "object-contain" : "object-cover"}
               />
             </div>
             <div>
@@ -85,6 +95,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             )}
           </div>
         </article>
+
+        {phases?.map((phase) => (
+          <div
+            key={phase.title}
+            className="mt-8 border-2 border-black bg-white p-6 shadow-[8px_8px_0_0_#000] md:p-8"
+          >
+            <ProjectPhaseContent phase={phase} />
+          </div>
+        ))}
       </div>
     </main>
   );
