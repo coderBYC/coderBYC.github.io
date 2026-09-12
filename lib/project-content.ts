@@ -1,9 +1,16 @@
+export interface ProjectStepImage {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
 export interface ProjectStep {
   title: string;
   description: string;
   input?: string;
   output?: string;
   note?: string;
+  images?: ProjectStepImage[];
 }
 
 export interface ProjectNarrativeBlock {
@@ -88,6 +95,18 @@ export const projectPhases: Record<string, ProjectPhase[]> = {
               title: "2. RRF (Reciprocal Rank Fusion)",
               description:
                 "Combine lexical and semantic retrieval scores. RRF is one of the strongest retrieval fusion techniques used today.",
+              images: [
+                {
+                  src: "/projects/rrf-formula.png",
+                  alt: "RRF formula: sum of 1 over k plus rank_i of document d",
+                  caption: "RRF score for a document across N ranked lists",
+                },
+                {
+                  src: "/projects/rrf-diagram.jpg",
+                  alt: "Reciprocal Rank Fusion diagram fusing retriever rankings into a fused ranking",
+                  caption: "How multiple retrievers fuse into one ranking",
+                },
+              ],
             },
             {
               title: "3. Time Decay",

@@ -11,15 +11,18 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import ProjectsSection from "@/components/ProjectsSection";
+import ArtSection from "@/components/ArtSection";
 import ContactSection from "@/components/ContactSection";
 import { IntroResponse } from "@/components/chat/ChatResponses";
-import { RevealLine, revealCompleteMs } from "@/components/chat/RevealLine";
+import { RevealLine, revealCompleteMs, SkipAnimationProvider, useSkipAnimation } from "@/components/chat/RevealLine";
 import {
+  artworks,
   chatSections,
   contactLinks,
   projects,
   type SectionPhase,
 } from "@/lib/data";
+import { loadChatVisit, saveChatVisit } from "@/lib/visit-state";
 
 const THINK_MS = 1000;
 const SEND_MS = 300;
@@ -41,15 +44,18 @@ interface PromptBarState {
   canSend: boolean;
 }
 
-function createInitialSections(): SectionState[] {
-  return chatSections.map((section) => ({
-    id: section.id,
-    question: section.question,
-    phase: "idle",
-    typedText: "",
-    isTyping: false,
-    isVisible: false,
-  }));
+function createInitialSections(visitedIds: string[] = []): SectionState[] {
+  return chatSections.map((section) => {
+    const visited = visitedIds.includes(section.id);
+    return {
+      id: section.id,
+      question: section.question,
+      phase: visited ? "visible" : "idle",
+      typedText: visited ? section.question : "",
+      isTyping: false,
+      isVisible: visited,
+    };
+  });
 }
 
 function ThinkingDots() {
@@ -161,6 +167,8 @@ function getLineCount(sectionId: string): number {
       return 5;
     case "projects":
       return 1 + projects.length;
+    case "art":
+      return 1 + artworks.length;
     case "contact":
       return 1 + contactLinks.length;
     default:
@@ -180,19 +188,21 @@ function ResponseContent({
   const section = chatSections.find((s) => s.id === sectionId);
   const hasIntroText = Boolean(section?.introText);
   const contentLineOffset = hasIntroText ? 1 : 0;
+  const skipAnimation = useSkipAnimation();
   const onCompleteRef = useRef(onContentComplete);
   onCompleteRef.current = onContentComplete;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       onCompleteRef.current(slideIndex);
-    }, revealCompleteMs(getLineCount(sectionId)));
+    }, revealCompleteMs(getLineCount(sectionId), skipAnimation));
     return () => clearTimeout(timer);
-  }, [sectionId, slideIndex]);
+  }, [sectionId, slideIndex, skipAnimation]);
 
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
     projects: <ProjectsSection lineOffset={contentLineOffset} />,
+    art: <ArtSection lineOffset={contentLineOffset} />,
     contact: <ContactSection lineOffset={contentLineOffset} />,
   };
 
@@ -209,15 +219,22 @@ function ResponseContent({
 }
 
 export default function ChatConversation() {
-  const [sections, setSections] = useState<SectionState[]>(createInitialSections);
+  const [sections, setSections] = useState<SectionState[]>(() =>
+    createInitialSections()
+  );
   const [activeSlide, setActiveSlide] = useState(0);
   const [maxUnlockedSlide, setMaxUnlockedSlide] = useState(0);
   const [promptBar, setPromptBar] = useState<PromptBarState | null>(null);
+  const [hydrated, setHydrated] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const promptStartedRef = useRef<Set<number>>(new Set());
+  const knownVisitedRef = useRef<Set<string>>(new Set());
+  const restoredVisitedRef = useRef<Set<string>>(new Set());
+  const sectionsRef = useRef(sections);
+  sectionsRef.current = sections;
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -276,6 +293,8 @@ export default function ChatConversation() {
               patchSection(index, { phase: "thinking" });
 
               const visibleTimer = setTimeout(() => {
+                const sectionId = chatSections[index]?.id;
+                if (sectionId) knownVisitedRef.current.add(sectionId);
                 patchSection(index, {
                   phase: "visible",
                   isVisible: true,
@@ -298,7 +317,21 @@ export default function ChatConversation() {
   const runFromSend = useCallback(
     (index: number) => {
       const question = chatSections[index]?.question;
-      if (!question) return;
+      const sectionId = chatSections[index]?.id;
+      if (!question || !sectionId) return;
+
+      const instant = restoredVisitedRef.current.has(sectionId);
+
+      if (instant) {
+        clearTimers();
+        patchSection(index, {
+          phase: "visible",
+          isTyping: false,
+          isVisible: true,
+          typedText: question,
+        });
+        return;
+      }
 
       clearTimers();
       patchSection(index, {
@@ -312,6 +345,7 @@ export default function ChatConversation() {
         patchSection(index, { phase: "thinking" });
 
         const visibleTimer = setTimeout(() => {
+          knownVisitedRef.current.add(sectionId);
           patchSection(index, {
             phase: "visible",
             isVisible: true,
@@ -382,17 +416,117 @@ export default function ChatConversation() {
     runFromSend(nextIndex);
   }, [promptBar, runFromSend]);
 
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= chatSections.length) return;
+
+      setPromptBar(null);
+      if (promptIntervalRef.current) {
+        clearInterval(promptIntervalRef.current);
+        promptIntervalRef.current = null;
+      }
+
+      setMaxUnlockedSlide((prev) => Math.max(prev, index));
+      setActiveSlide(index);
+      slideRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
+
+      const section = sectionsRef.current[index];
+      if (!section || section.phase === "idle") {
+        runFromSend(index);
+      }
+    },
+    [runFromSend]
+  );
+
   const handleContentComplete = useCallback(
     (index: number) => {
       if (index >= chatSections.length - 1) return;
       if (promptStartedRef.current.has(index)) return;
       promptStartedRef.current.add(index);
+
+      const sectionId = chatSections[index]?.id;
+      const alreadySeen = sectionId
+        ? restoredVisitedRef.current.has(sectionId)
+        : false;
+
+      if (alreadySeen) {
+        const question = chatSections[index + 1]?.question;
+        if (!question) return;
+        setPromptBar({
+          hostSlideIndex: index,
+          text: question,
+          isTyping: false,
+          canSend: true,
+        });
+        return;
+      }
+
       startPromptBarTyping(index);
     },
     [startPromptBarTyping]
   );
 
   useEffect(() => {
+    const visited = sections
+      .filter((section) => section.isVisible)
+      .map((section) => section.id);
+
+    if (visited.length === 0 || !hydrated) return;
+
+    saveChatVisit({
+      visitedIds: visited,
+      maxUnlocked: maxUnlockedSlide,
+      activeSlide,
+    });
+  }, [sections, maxUnlockedSlide, activeSlide, hydrated]);
+
+  useEffect(() => {
+    const visit = loadChatVisit();
+    const returning = Boolean(visit?.visitedIds.length);
+
+    if (returning && visit) {
+      knownVisitedRef.current = new Set(visit.visitedIds);
+      restoredVisitedRef.current = new Set(visit.visitedIds);
+      setSections(createInitialSections(visit.visitedIds));
+      setActiveSlide(visit.activeSlide);
+      setMaxUnlockedSlide(visit.maxUnlocked);
+
+      const visitedIndexes = visit.visitedIds
+        .map((id) => chatSections.findIndex((section) => section.id === id))
+        .filter((index) => index >= 0);
+
+      visitedIndexes.forEach((index) => {
+        if (index < chatSections.length - 1) {
+          promptStartedRef.current.add(index);
+        }
+      });
+
+      const lastVisitedIndex = visitedIndexes.length
+        ? Math.max(...visitedIndexes)
+        : 0;
+
+      if (lastVisitedIndex < chatSections.length - 1) {
+        const question = chatSections[lastVisitedIndex + 1]?.question;
+        if (question) {
+          setPromptBar({
+            hostSlideIndex: lastVisitedIndex,
+            text: question,
+            isTyping: false,
+            canSend: true,
+          });
+        }
+      }
+
+      setHydrated(true);
+      requestAnimationFrame(() => {
+        slideRefs.current[visit.activeSlide]?.scrollIntoView({
+          behavior: "auto",
+        });
+      });
+      return clearTimers;
+    }
+
+    setHydrated(true);
     runAutoSequence(0);
     return clearTimers;
   }, [runAutoSequence, clearTimers]);
@@ -435,11 +569,37 @@ export default function ChatConversation() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [promptBar, handlePromptSend]);
 
+  if (!hydrated) {
+    return <div className="fixed inset-0 bg-white" aria-hidden />;
+  }
+
   return (
     <div
       ref={scrollContainerRef}
       className="fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none"
     >
+      <nav className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:px-6">
+        <div className="pointer-events-auto flex max-w-3xl flex-wrap items-center justify-center gap-1 rounded-full border-2 border-black bg-white/95 px-2 py-1.5 shadow-[3px_3px_0_0_#000] backdrop-blur-sm">
+          {chatSections.map((section, index) => {
+            const isActive = activeSlide === index;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => goToSlide(index)}
+                className={`rounded-full px-3 py-1.5 text-xs tracking-wide transition-colors md:text-sm ${
+                  isActive
+                    ? "bg-black text-white"
+                    : "text-black/60 hover:text-black"
+                }`}
+              >
+                {section.navLabel}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
       {sections.map((section, index) => {
         const showQuestion =
           section.phase === "typing" ||
@@ -455,6 +615,8 @@ export default function ChatConversation() {
         const isActive = activeSlide === index;
         const showPromptBar =
           promptBar?.hostSlideIndex === index && section.phase === "visible";
+        const isDense =
+          section.id === "projects" || section.id === "art";
 
         return (
           <section
@@ -466,15 +628,15 @@ export default function ChatConversation() {
             aria-hidden={!isActive && section.phase === "idle"}
           >
             <div
-              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-6 md:px-6 md:py-8 ${
-                section.id === "projects"
-                  ? "min-h-0 overflow-visible py-2"
+              className={`mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 pb-6 pt-20 md:px-6 md:pb-8 md:pt-24 ${
+                isDense
+                  ? "min-h-0 overflow-y-auto overscroll-contain py-2 pt-20 md:pt-24"
                   : "overflow-hidden"
               }`}
             >
               <div
                 className={`flex w-full flex-col ${
-                  section.id === "projects" ? "overflow-visible" : ""
+                  isDense ? "" : ""
                 }`}
               >
                 {showQuestion && (
@@ -504,13 +666,15 @@ export default function ChatConversation() {
                         )}
 
                         {section.isVisible && (
-                          <div>
+                          <SkipAnimationProvider
+                            skip={restoredVisitedRef.current.has(section.id)}
+                          >
                             <ResponseContent
                               sectionId={section.id}
                               slideIndex={index}
                               onContentComplete={handleContentComplete}
                             />
-                          </div>
+                          </SkipAnimationProvider>
                         )}
                       </AnimatePresence>
                     </div>

@@ -17,19 +17,28 @@ export interface ChatSectionConfig {
   id: string;
   question: string;
   introText?: string;
+  navLabel: string;
 }
 
 export const chatSections: ChatSectionConfig[] = [
-  { id: "intro", question: "Who are you?" },
+  { id: "intro", question: "Who are you?", navLabel: "Intro" },
   {
     id: "projects",
     question: "What projects have you built?",
     introText: "These are my past projects, spanning from agents to design:",
+    navLabel: "Projects",
+  },
+  {
+    id: "art",
+    question: "Do you make art?",
+    introText: "Here are some of my artworks — titles coming soon.",
+    navLabel: "Art",
   },
   {
     id: "contact",
     question: "How can I contact you?",
     introText: "Here is my contact information:",
+    navLabel: "Contact",
   },
 ];
 
@@ -94,6 +103,75 @@ export const projects: Project[] = [
     description: "Turn textbook into quizzes. My first project.",
     tech: ["JavaScript", "Python", "OpenAI API"],
     icon: "/projects/ai-quiz-generator.png",
+  },
+];
+
+export interface Artwork {
+  id: string;
+  title: string;
+  src: string;
+}
+
+export const artworks: Artwork[] = [
+  {
+    id: "artwork-01",
+    title: "Untitled 1",
+    src: "/art/artwork-01.jpg",
+  },
+  {
+    id: "artwork-02",
+    title: "Untitled 2",
+    src: "/art/artwork-02.jpg",
+  },
+  {
+    id: "artwork-03",
+    title: "Untitled 3",
+    src: "/art/artwork-03.jpg",
+  },
+  {
+    id: "artwork-04",
+    title: "Untitled 4",
+    src: "/art/artwork-04.jpg",
+  },
+  {
+    id: "artwork-05",
+    title: "Untitled 5",
+    src: "/art/artwork-05.jpg",
+  },
+  {
+    id: "artwork-06",
+    title: "Untitled 6",
+    src: "/art/artwork-06.jpg",
+  },
+  {
+    id: "artwork-07",
+    title: "Untitled 7",
+    src: "/art/artwork-07.jpg",
+  },
+  {
+    id: "artwork-08",
+    title: "Untitled 8",
+    src: "/art/artwork-08.jpg",
+  },
+  {
+    id: "artwork-09",
+    title: "Untitled 9",
+    src: "/art/artwork-09.jpg",
+  },
+  {
+    id: "artwork-10",
+    title: "Untitled 10",
+    src: "/art/artwork-10.jpg",
+  },
+  {
+    id: "artwork-11",
+    title: "Untitled 11",
+    src: "/art/artwork-11.jpg",
+  },
+  {
+    id: "artwork-12",
+    title: "Untitled 12",
+    src: "/art/artwork-12.jpg",
   },
 ];
 

@@ -95,6 +95,29 @@ export default function ProjectPhaseContent({ phase }: { phase: ProjectPhase }) 
                 {step.note && (
                   <p className="mt-3 text-sm text-black/50">{step.note}</p>
                 )}
+
+                {step.images && step.images.length > 0 && (
+                  <div className="mt-5 space-y-5">
+                    {step.images.map((image) => (
+                      <figure key={image.src}>
+                        <div className="relative w-full overflow-hidden">
+                          <Image
+                            src={image.src}
+                            alt={image.alt}
+                            width={1024}
+                            height={682}
+                            className="h-auto w-full object-contain"
+                          />
+                        </div>
+                        {image.caption && (
+                          <figcaption className="mt-2 text-center text-xs tracking-wide text-black/45">
+                            {image.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

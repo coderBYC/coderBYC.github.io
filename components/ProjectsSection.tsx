@@ -5,11 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import { projects } from "@/lib/data";
-import { RevealLine } from "@/components/chat/RevealLine";
+import { RevealLine, useSkipAnimation } from "@/components/chat/RevealLine";
 
 const ease = [0.25, 0.1, 0.25, 1] as const;
 
 export default function ProjectsSection({ lineOffset = 0 }: { lineOffset?: number }) {
+  const skipAnimation = useSkipAnimation();
+
   return (
     <section id="projects" className="w-full pb-3">
       <div className="flex flex-col">
@@ -24,13 +26,17 @@ export default function ProjectsSection({ lineOffset = 0 }: { lineOffset?: numbe
                   <div className="z-10 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-black bg-white" />
                   {!isLast && (
                     <motion.div
-                      initial={{ scaleY: 0 }}
+                      initial={skipAnimation ? false : { scaleY: 0 }}
                       animate={{ scaleY: 1 }}
-                      transition={{
-                        delay: lineIndex * 0.18 + 0.28,
-                        duration: 0.42,
-                        ease,
-                      }}
+                      transition={
+                        skipAnimation
+                          ? { duration: 0 }
+                          : {
+                              delay: lineIndex * 0.18 + 0.28,
+                              duration: 0.42,
+                              ease,
+                            }
+                      }
                       className="w-px flex-1 origin-top bg-black/25"
                       style={{ minHeight: "1rem" }}
                     />
