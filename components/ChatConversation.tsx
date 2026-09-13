@@ -10,10 +10,12 @@ import {
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
+import AeroGlassNav from "@/components/AeroGlassNav";
 import AeroProjectWindow from "@/components/AeroProjectWindow";
+import WeatherSection from "@/components/WeatherSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import ContactSection from "@/components/ContactSection";
-import { IntroResponse } from "@/components/chat/ChatResponses";
+import { AboutResponse, EducationResponse } from "@/components/chat/ChatResponses";
 import { RevealLine, revealCompleteMs, SkipAnimationProvider, useSkipAnimation } from "@/components/chat/RevealLine";
 import {
   chatSections,
@@ -167,12 +169,16 @@ function PromptBar({
 
 function getLineCount(sectionId: string): number {
   switch (sectionId) {
-    case "intro":
-      return 5;
+    case "about":
+      return 4;
+    case "education":
+      return 2;
     case "projects":
       return 1 + projects.length;
     case "contact":
       return 1 + contactLinks.length;
+    case "weather":
+      return 1;
     default:
       return 1;
   }
@@ -204,7 +210,8 @@ function ResponseContent({
   }, [sectionId, slideIndex, skipAnimation]);
 
   const content: Record<string, ReactNode> = {
-    intro: <IntroResponse />,
+    about: <AboutResponse />,
+    education: <EducationResponse />,
     projects: (
       <ProjectsSection
         lineOffset={contentLineOffset}
@@ -212,6 +219,7 @@ function ResponseContent({
       />
     ),
     contact: <ContactSection lineOffset={contentLineOffset} />,
+    weather: <WeatherSection />,
   };
 
   return (
@@ -696,6 +704,14 @@ export default function ChatConversation({
           <span>Command Prompt</span>
         </div>
       </div>
+      {theme === "aero" && (
+        <AeroGlassNav
+          sections={chatSections}
+          activeId={chatSections[activeSlide]?.id ?? "about"}
+          onSelect={goToSlide}
+          onStyle={onOpenStylePicker}
+        />
+      )}
       <div className="aero-stage">
       <div
         ref={frameRef}

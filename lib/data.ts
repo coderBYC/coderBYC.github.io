@@ -21,7 +21,12 @@ export interface ChatSectionConfig {
 }
 
 export const chatSections: ChatSectionConfig[] = [
-  { id: "intro", question: "Who are you?", navLabel: "Intro" },
+  { id: "about", question: "Who are you?", navLabel: "About" },
+  {
+    id: "education",
+    question: "Where did you study?",
+    navLabel: "Education",
+  },
   {
     id: "projects",
     question: "What projects have you built?",
@@ -34,6 +39,11 @@ export const chatSections: ChatSectionConfig[] = [
     introText: "Here is my contact information:",
     navLabel: "Contact",
   },
+  {
+    id: "weather",
+    question: "What's the weather?",
+    navLabel: "Weather",
+  },
 ];
 
 export interface Project {
@@ -45,6 +55,7 @@ export interface Project {
   description: string;
   tech: string[];
   icon: string;
+  youtubeId?: string;
 }
 
 export const projects: Project[] = [
@@ -63,9 +74,11 @@ export const projects: Project[] = [
     id: "snapcycle",
     title: "SnapCycle",
     url: "https://devpost.com/software/rrr-s98zwc",
+    githubUrl: "https://github.com/prithsk/SnapCycle",
     date: "2026. June",
     description:
-      "Zero waste app that recycles your waste for you. Won Berkeley AI Hackathon 2026 Social Impact Track.",
+      "Zero waste app that recycles your waste for you. I built the entire backend and Gemini API, and connected a Browserbase research agent with a Redis vector database. Won Berkeley AI Hackathon 2026 Social Impact Track.",
+    youtubeId: "Z8rMbCB_Mno",
     tech: ["Python", "Redis", "Browserbase", "Gemini Multimodal API"],
     icon: "/projects/snapcycle.png",
   },

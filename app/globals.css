@@ -335,7 +335,10 @@ html[data-theme="aero"] .aero-project-body {
   flex: 1;
   overflow: auto;
   padding: 16px 18px 22px;
-  background: #fff;
+  border: 1px solid #fff;
+  background: linear-gradient(rgba(255, 255, 255, 0.28), rgba(170, 230, 255, 0.22));
+  box-shadow: inset 0 0 18px rgba(148, 246, 255, 0.4);
+  backdrop-filter: blur(16px);
 }
 
 html[data-theme="aero"] .aero-desktop {
@@ -400,6 +403,155 @@ html[data-theme="aero"] .aero-frame.is-opening {
   html[data-theme="aero"] .aero-frame.is-opening {
     animation: none;
   }
+}
+
+html[data-theme="aero"] .aero-glass-nav {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  width: 132px;
+  transform: translateY(-50%);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  overflow: hidden;
+  padding: 16px 12px 18px;
+  border: 1px solid #fff;
+  border-radius: 36px;
+  background: linear-gradient(rgba(37, 209, 248, 0.22), rgba(0, 168, 220, 0.38));
+  box-shadow:
+    inset 0 0 18px rgba(148, 246, 255, 0.45),
+    0 8px 18px rgba(0, 0, 0, 0.22),
+    0 0 10px 2px rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  color: #fff;
+}
+
+html[data-theme="aero"] .aero-glass-nav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at top, rgba(160, 245, 255, 0.7), transparent 70%);
+  filter: blur(8px);
+}
+
+html[data-theme="aero"] .aero-glass-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 42%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.55), transparent);
+}
+
+html[data-theme="aero"] .aero-glass-nav button {
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  background: rgba(180, 255, 248, 0.12);
+  box-shadow:
+    inset 0 0 12px rgba(148, 246, 255, 0.35),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  padding: 7px 8px;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 40, 70, 0.45);
+}
+
+html[data-theme="aero"] .aero-glass-nav button.is-active,
+html[data-theme="aero"] .aero-glass-nav button:hover {
+  background: rgba(180, 255, 248, 0.42);
+}
+
+html[data-theme="aero"] .aero-glass-weather {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 6px !important;
+}
+
+html[data-theme="aero"] .aero-glass-weather strong {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+html[data-theme="aero"] .aero-glass-weather span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+html[data-theme="aero"] .aero-glass-divider {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+html[data-theme="aero"] .aero-stage .aero-frame {
+  width: min(820px, calc(100vw - 13.5rem));
+}
+
+@media (max-width: 980px) {
+  html[data-theme="aero"] .aero-glass-nav {
+    display: none;
+  }
+
+  html[data-theme="aero"] .aero-menubar {
+    display: flex;
+  }
+
+  html[data-theme="aero"] .aero-stage .aero-frame {
+    width: min(920px, calc(100vw - 1.5rem));
+  }
+}
+
+html[data-theme="aero"] .aero-weather {
+  color: #14324a;
+}
+
+html[data-theme="aero"] .aero-weather-place {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html[data-theme="aero"] .aero-weather-temp {
+  font-size: 64px;
+  line-height: 1;
+  color: #0e4ea6 !important;
+}
+
+html[data-theme="aero"] .aero-weather-label,
+html[data-theme="aero"] .aero-weather-range {
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+html[data-theme="aero"] .aero-weather-stats {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+html[data-theme="aero"] .aero-weather-stats dt {
+  font-size: 12px;
+  color: #3d6d8c;
+}
+
+html[data-theme="aero"] .aero-weather-stats dd {
+  font-size: 16px;
+  color: #16344c;
 }
 
 html[data-theme="aero"] .aero-frame {
@@ -530,7 +682,7 @@ html[data-theme="aero"] .aero-btn.close::after {
 }
 
 html[data-theme="aero"] .aero-menubar {
-  display: flex;
+  display: none;
   gap: 1px;
   margin: 0 6px;
   padding: 2px 4px;
@@ -564,9 +716,9 @@ html[data-theme="aero"] .aero-client {
   flex: 1;
   margin: 0 6px;
   overflow: hidden;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.7);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 html[data-theme="aero"] .aero-client > section {
@@ -581,7 +733,8 @@ html[data-theme="aero"] .aero-client > section[data-active="true"] {
   display: flex !important;
 }
 
-html[data-theme="aero"] .aero-client > section[data-section="intro"] {
+html[data-theme="aero"] .aero-client > section[data-section="about"],
+html[data-theme="aero"] .aero-client > section[data-section="education"] {
   background: #0b7ec4 url("/themes/frutiger-aqua.png") center / cover no-repeat !important;
 }
 
@@ -589,15 +742,57 @@ html[data-theme="aero"] .aero-client > section[data-section="projects"] {
   background: #3cb43a url("/themes/frutiger-eco.png") center / cover no-repeat !important;
 }
 
+html[data-theme="aero"] .aero-client > section[data-section="weather"] {
+  background: #69b7f0 url("/themes/frutiger-aero.jpg") center / cover no-repeat !important;
+}
+
 html[data-theme="aero"] .aero-client > section[data-section="contact"] {
   background: #e25a1c url("/themes/frutiger-dorfic.png") center / cover no-repeat !important;
 }
 
 html[data-theme="aero"] .aero-client > section[data-section] > div {
+  position: relative;
+  overflow: hidden;
   margin: 16px 16px 78px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75);
+  border: 1px solid #fff;
+  border-radius: 28px;
+  background: linear-gradient(rgba(255, 255, 255, 0.28), rgba(170, 230, 255, 0.22));
+  box-shadow:
+    inset 0 0 18px rgba(148, 246, 255, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    0 0 10px 2px rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(16px);
+}
+
+html[data-theme="aero"] .aero-client > section[data-section] > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 38%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
+}
+
+html[data-theme="aero"] .aero-client > section[data-section] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="aero"] .aero-client .bg-white,
+html[data-theme="aero"] .aero-client .bg-white\/95 {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow:
+    inset 0 0 12px rgba(148, 246, 255, 0.28),
+    0 4px 10px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(8px);
+}
+
+html[data-theme="aero"] .aero-client .bg-yellow-50 {
+  background: rgba(255, 244, 180, 0.42) !important;
 }
 
 html[data-theme="aero"] .aero-client .pt-20 {

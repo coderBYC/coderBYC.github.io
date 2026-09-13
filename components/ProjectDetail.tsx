@@ -44,6 +44,19 @@ export default function ProjectDetail({
           {project.description}
         </p>
 
+        {project.youtubeId && (
+          <div className="mb-8 overflow-hidden border-2 border-black shadow-[4px_4px_0_0_#000]">
+            <iframe
+              className="aspect-video w-full"
+              src={`https://www.youtube.com/embed/${project.youtubeId}`}
+              title={`${project.title} video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        )}
+
         <div className="mb-8 flex flex-wrap gap-2">
           {project.tech.map((tech) => (
             <TechPill key={tech} name={tech} />
