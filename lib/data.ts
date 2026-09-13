@@ -71,11 +71,11 @@ export const projects: Project[] = [
   },
   {
     id: "crumbo",
-    title: "Crumbo (Formally Let Him Cook)",
+    title: "Let Him Cook",
     url: "https://apps.apple.com/us/app/let-him-cook-recipe-saver/id6760598097",
     date: "2026. March —",
     description:
-      "iOS app that turns cooking reels into beautiful recipes. Formally Let Him Cook. Currently generating XXX per month.",
+      "iOS app that turns cooking reels into beautiful recipes. Currently generating XXX per month.",
     tech: ["Swift", "Python", "Gemini API", "Supabase", "Render"],
     icon: "/projects/crumbo.png",
   },

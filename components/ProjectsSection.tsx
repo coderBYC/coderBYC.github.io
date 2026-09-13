@@ -9,7 +9,13 @@ import { RevealLine, useSkipAnimation } from "@/components/chat/RevealLine";
 
 const ease = [0.25, 0.1, 0.25, 1] as const;
 
-export default function ProjectsSection({ lineOffset = 0 }: { lineOffset?: number }) {
+export default function ProjectsSection({
+  lineOffset = 0,
+  onOpenProject,
+}: {
+  lineOffset?: number;
+  onOpenProject?: (id: string) => void;
+}) {
   const skipAnimation = useSkipAnimation();
 
   return (
@@ -46,6 +52,13 @@ export default function ProjectsSection({ lineOffset = 0 }: { lineOffset?: numbe
                 <div className={`min-w-0 flex-1 ${isLast ? "pb-1" : "pb-1.5"}`}>
                   <Link
                     href={`/projects/${project.id}`}
+                    onClick={(event) => {
+                      if (document.documentElement.dataset.theme !== "aero" || !onOpenProject) {
+                        return;
+                      }
+                      event.preventDefault();
+                      onOpenProject(project.id);
+                    }}
                     className={`group block border-2 border-black p-2 shadow-[3px_3px_0_0_#000] transition-all duration-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_0_#000] ${
                       project.id === "cortex-memory" ? "bg-yellow-50" : "bg-white"
                     }`}

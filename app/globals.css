@@ -281,8 +281,61 @@ html[data-theme="retro"] .aero-client > section[data-active="true"] {
   display: contents;
 }
 
+.aero-stage,
+.aero-orb {
+  display: contents;
+}
+
+.aero-orb {
+  display: none;
+}
+
 .aero-desktop {
   display: none;
+}
+
+html[data-theme="aero"] .aero-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+}
+
+html[data-theme="aero"] .aero-orb {
+  position: absolute;
+  right: 18px;
+  bottom: 36px;
+  z-index: 4;
+  display: block;
+  width: min(168px, 26vw);
+  pointer-events: none;
+  filter: drop-shadow(0 8px 14px rgba(8, 40, 70, 0.28));
+}
+
+.aero-project-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html[data-theme="aero"] .aero-project-window {
+  width: min(880px, calc(100vw - 2.5rem));
+  height: min(82vh, 740px);
+  z-index: 2;
+}
+
+html[data-theme="aero"] .aero-project-window .aero-menubar {
+  display: none;
+}
+
+html[data-theme="aero"] .aero-project-body {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 16px 18px 22px;
+  background: #fff;
 }
 
 html[data-theme="aero"] .aero-desktop {
@@ -366,6 +419,11 @@ html[data-theme="aero"] .aero-frame {
     inset 0 0 0 1px rgba(255, 255, 255, 0.6);
   font-family: "Segoe UI", "Segoe UI Variable", var(--font-aero), "Noto Sans", sans-serif;
   font-weight: 400;
+}
+
+html[data-theme="aero"] .aero-frame.aero-project-window {
+  width: min(880px, calc(100vw - 2.5rem));
+  height: min(82vh, 740px);
 }
 
 html[data-theme="aero"] .aero-titlebar {

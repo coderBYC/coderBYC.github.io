@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
+import AeroProjectWindow from "@/components/AeroProjectWindow";
 import ProjectsSection from "@/components/ProjectsSection";
 import ContactSection from "@/components/ContactSection";
 import { IntroResponse } from "@/components/chat/ChatResponses";
@@ -181,10 +182,12 @@ function ResponseContent({
   sectionId,
   slideIndex,
   onContentComplete,
+  onOpenProject,
 }: {
   sectionId: string;
   slideIndex: number;
   onContentComplete: (index: number) => void;
+  onOpenProject?: (id: string) => void;
 }) {
   const section = chatSections.find((s) => s.id === sectionId);
   const hasIntroText = Boolean(section?.introText);
@@ -202,7 +205,12 @@ function ResponseContent({
 
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
-    projects: <ProjectsSection lineOffset={contentLineOffset} />,
+    projects: (
+      <ProjectsSection
+        lineOffset={contentLineOffset}
+        onOpenProject={onOpenProject}
+      />
+    ),
     contact: <ContactSection lineOffset={contentLineOffset} />,
   };
 
@@ -239,6 +247,7 @@ export default function ChatConversation({
   const frameRef = useRef<HTMLDivElement>(null);
   const launchIconRef = useRef<HTMLDivElement>(null);
   const [opening, setOpening] = useState(false);
+  const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const promptStartedRef = useRef<Set<number>>(new Set());
   const knownVisitedRef = useRef<Set<string>>(new Set());
   const restoredVisitedRef = useRef<Set<string>>(new Set());
@@ -593,6 +602,7 @@ export default function ChatConversation({
         "brutalist") as SiteStyle;
       themeRef.current = next;
       setTheme(next);
+      if (next !== "aero") setOpenProjectId(null);
       if (!isScenicTheme(next)) return;
 
       setMaxUnlockedSlide(chatSections.length - 1);
@@ -672,7 +682,7 @@ export default function ChatConversation({
       <div className="aero-desktop" aria-hidden>
         <div
           ref={launchIconRef}
-          className={`aero-icon${opening ? " is-source" : ""}`}
+          className={`aero-icon${opening || openProjectId ? " is-source" : ""}`}
         >
           <img src="/themes/icon-ie.png" alt="" />
           <span>Internet Explorer</span>
@@ -686,6 +696,7 @@ export default function ChatConversation({
           <span>Command Prompt</span>
         </div>
       </div>
+      <div className="aero-stage">
       <div
         ref={frameRef}
         className={`aero-frame${opening ? " is-opening" : ""}`}
@@ -829,6 +840,7 @@ export default function ChatConversation({
                               sectionId={section.id}
                               slideIndex={index}
                               onContentComplete={handleContentComplete}
+                              onOpenProject={setOpenProjectId}
                             />
                           </SkipAnimationProvider>
                         )}
@@ -856,6 +868,19 @@ export default function ChatConversation({
         <span>{chatSections[activeSlide]?.navLabel}</span>
       </div>
       </div>
+      <img
+        className="aero-orb"
+        src="/themes/aero-orb.png"
+        alt=""
+      />
+      </div>
+      {theme === "aero" && openProjectId && (
+        <AeroProjectWindow
+          projectId={openProjectId}
+          originRef={launchIconRef}
+          onClose={() => setOpenProjectId(null)}
+        />
+      )}
     </div>
   );
 }
