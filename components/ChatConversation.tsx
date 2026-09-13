@@ -11,22 +11,25 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import ProjectsSection from "@/components/ProjectsSection";
-import ArtSection from "@/components/ArtSection";
 import ContactSection from "@/components/ContactSection";
 import { IntroResponse } from "@/components/chat/ChatResponses";
 import { RevealLine, revealCompleteMs, SkipAnimationProvider, useSkipAnimation } from "@/components/chat/RevealLine";
 import {
-  artworks,
   chatSections,
   contactLinks,
   projects,
   type SectionPhase,
 } from "@/lib/data";
 import { loadChatVisit, saveChatVisit } from "@/lib/visit-state";
+import type { SiteStyle } from "@/lib/theme";
 
 const THINK_MS = 1000;
 const SEND_MS = 300;
 const PROMPT_TYPE_MS = 1800;
+
+function isScenicTheme(theme: string) {
+  return theme === "retro" || theme === "aero";
+}
 
 interface SectionState {
   id: string;
@@ -167,8 +170,6 @@ function getLineCount(sectionId: string): number {
       return 5;
     case "projects":
       return 1 + projects.length;
-    case "art":
-      return 1 + artworks.length;
     case "contact":
       return 1 + contactLinks.length;
     default:
@@ -202,7 +203,6 @@ function ResponseContent({
   const content: Record<string, ReactNode> = {
     intro: <IntroResponse />,
     projects: <ProjectsSection lineOffset={contentLineOffset} />,
-    art: <ArtSection lineOffset={contentLineOffset} />,
     contact: <ContactSection lineOffset={contentLineOffset} />,
   };
 
@@ -218,14 +218,20 @@ function ResponseContent({
   );
 }
 
-export default function ChatConversation() {
+export default function ChatConversation({
+  onOpenStylePicker,
+}: {
+  onOpenStylePicker?: () => void;
+}) {
   const [sections, setSections] = useState<SectionState[]>(() =>
     createInitialSections()
   );
   const [activeSlide, setActiveSlide] = useState(0);
   const [maxUnlockedSlide, setMaxUnlockedSlide] = useState(0);
   const [promptBar, setPromptBar] = useState<PromptBarState | null>(null);
+  const [theme, setTheme] = useState<SiteStyle>("brutalist");
   const [hydrated, setHydrated] = useState(false);
+  const themeRef = useRef<SiteStyle>("brutalist");
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
@@ -412,7 +418,9 @@ export default function ChatConversation() {
 
     setMaxUnlockedSlide(nextIndex);
     setActiveSlide(nextIndex);
-    slideRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth" });
+    if (!isScenicTheme(document.documentElement.dataset.theme ?? "")) {
+      slideRefs.current[nextIndex]?.scrollIntoView({ behavior: "smooth" });
+    }
     runFromSend(nextIndex);
   }, [promptBar, runFromSend]);
 
@@ -428,7 +436,9 @@ export default function ChatConversation() {
 
       setMaxUnlockedSlide((prev) => Math.max(prev, index));
       setActiveSlide(index);
-      slideRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
+      if (!isScenicTheme(document.documentElement.dataset.theme ?? "")) {
+        slideRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
+      }
 
       const section = sectionsRef.current[index];
       if (!section || section.phase === "idle") {
@@ -483,13 +493,25 @@ export default function ChatConversation() {
   useEffect(() => {
     const visit = loadChatVisit();
     const returning = Boolean(visit?.visitedIds.length);
+    const currentTheme = (document.documentElement.dataset.theme ??
+      "brutalist") as SiteStyle;
+    themeRef.current = currentTheme;
+    setTheme(currentTheme);
+
+    if (isScenicTheme(currentTheme)) {
+      setMaxUnlockedSlide(chatSections.length - 1);
+      setSections(createInitialSections(chatSections.map((section) => section.id)));
+      setHydrated(true);
+      return clearTimers;
+    }
 
     if (returning && visit) {
       knownVisitedRef.current = new Set(visit.visitedIds);
       restoredVisitedRef.current = new Set(visit.visitedIds);
+      const lastIndex = chatSections.length - 1;
       setSections(createInitialSections(visit.visitedIds));
-      setActiveSlide(visit.activeSlide);
-      setMaxUnlockedSlide(visit.maxUnlocked);
+      setActiveSlide(Math.min(visit.activeSlide, lastIndex));
+      setMaxUnlockedSlide(Math.min(visit.maxUnlocked, lastIndex));
 
       const visitedIndexes = visit.visitedIds
         .map((id) => chatSections.findIndex((section) => section.id === id))
@@ -519,6 +541,7 @@ export default function ChatConversation() {
 
       setHydrated(true);
       requestAnimationFrame(() => {
+        if (isScenicTheme(document.documentElement.dataset.theme ?? "")) return;
         slideRefs.current[visit.activeSlide]?.scrollIntoView({
           behavior: "auto",
         });
@@ -532,6 +555,36 @@ export default function ChatConversation() {
   }, [runAutoSequence, clearTimers]);
 
   useEffect(() => {
+    const syncTheme = () => {
+      const next = (document.documentElement.dataset.theme ??
+        "brutalist") as SiteStyle;
+      themeRef.current = next;
+      setTheme(next);
+      if (!isScenicTheme(next)) return;
+
+      setMaxUnlockedSlide(chatSections.length - 1);
+      setPromptBar(null);
+      setSections((prev) =>
+        prev.map((section) => ({
+          ...section,
+          phase: "visible",
+          isVisible: true,
+          isTyping: false,
+          typedText: section.question,
+        }))
+      );
+    };
+
+    syncTheme();
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
@@ -543,6 +596,7 @@ export default function ChatConversation() {
     if (!container) return;
 
     const handleScroll = () => {
+      if (isScenicTheme(document.documentElement.dataset.theme ?? "")) return;
       const index = Math.round(container.scrollTop / container.clientHeight);
       const clamped = Math.min(index, maxUnlockedSlide);
       setActiveSlide(clamped);
@@ -561,6 +615,7 @@ export default function ChatConversation() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Enter" || !promptBar?.canSend) return;
+      if (document.body.dataset.stylePicker === "open") return;
       event.preventDefault();
       handlePromptSend();
     };
@@ -573,12 +628,51 @@ export default function ChatConversation() {
     return <div className="fixed inset-0 bg-white" aria-hidden />;
   }
 
+  const scenic = isScenicTheme(theme);
+
   return (
     <div
       ref={scrollContainerRef}
-      className="fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none"
+      className="chat-root fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none"
     >
-      <nav className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:px-6">
+      <div className="theme-wallpaper" aria-hidden />
+      <div className="aero-frame">
+      <div className="aero-titlebar">
+        <span className="aero-title">coderBYC — Portfolio</span>
+        <span className="aero-controls">
+          <span className="aero-btn min" aria-hidden>—</span>
+          <span className="aero-btn max" aria-hidden>□</span>
+          <button
+            type="button"
+            className="aero-btn close"
+            onClick={onOpenStylePicker}
+            aria-label="Change style"
+          >
+            ×
+          </button>
+        </span>
+      </div>
+      <div className="aero-menubar" role="menubar">
+        {chatSections.map((section, index) => (
+          <button
+            key={section.id}
+            type="button"
+            role="menuitem"
+            onClick={() => goToSlide(index)}
+            className={activeSlide === index ? "is-active" : ""}
+          >
+            {section.navLabel}
+          </button>
+        ))}
+        <button
+          type="button"
+          className="ml-auto"
+          onClick={onOpenStylePicker}
+        >
+          Style
+        </button>
+      </div>
+      <nav className="site-nav pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:px-6">
         <div className="pointer-events-auto flex max-w-3xl flex-wrap items-center justify-center gap-1 rounded-full border-2 border-black bg-white/95 px-2 py-1.5 shadow-[3px_3px_0_0_#000] backdrop-blur-sm">
           {chatSections.map((section, index) => {
             const isActive = activeSlide === index;
@@ -597,8 +691,16 @@ export default function ChatConversation() {
               </button>
             );
           })}
+          <button
+            type="button"
+            onClick={onOpenStylePicker}
+            className="rounded-full px-3 py-1.5 text-xs tracking-wide text-black/60 transition-colors hover:text-black md:text-sm"
+          >
+            Style
+          </button>
         </div>
       </nav>
+      <div className="aero-client">
 
       {sections.map((section, index) => {
         const showQuestion =
@@ -614,9 +716,11 @@ export default function ChatConversation() {
 
         const isActive = activeSlide === index;
         const showPromptBar =
-          promptBar?.hostSlideIndex === index && section.phase === "visible";
-        const isDense =
-          section.id === "projects" || section.id === "art";
+          !scenic &&
+          promptBar?.hostSlideIndex === index &&
+          section.phase === "visible";
+        const isDense = section.id === "projects";
+        const showContent = scenic || section.isVisible;
 
         return (
           <section
@@ -624,6 +728,7 @@ export default function ChatConversation() {
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
+            data-active={isActive ? "true" : "false"}
             className="flex h-screen snap-start snap-always flex-col bg-white"
             aria-hidden={!isActive && section.phase === "idle"}
           >
@@ -639,7 +744,7 @@ export default function ChatConversation() {
                   isDense ? "" : ""
                 }`}
               >
-                {showQuestion && (
+                {!scenic && showQuestion && (
                   <div className="mb-4 flex shrink-0 justify-end">
                     {section.phase === "typing" ? (
                       <UserBubble text={section.typedText} typing />
@@ -649,12 +754,12 @@ export default function ChatConversation() {
                   </div>
                 )}
 
-                {showResponse && (
+                {(scenic || showResponse) && (
                   <div className="flex min-h-0 flex-col gap-3">
-                    <AiAvatar />
+                    {!scenic && <AiAvatar />}
                     <div className="min-w-0">
                       <AnimatePresence mode="wait">
-                        {section.phase === "thinking" && (
+                        {!scenic && section.phase === "thinking" && (
                           <motion.div
                             key="thinking"
                             initial={{ opacity: 0 }}
@@ -665,7 +770,7 @@ export default function ChatConversation() {
                           </motion.div>
                         )}
 
-                        {section.isVisible && (
+                        {showContent && (
                           <SkipAnimationProvider
                             skip={restoredVisitedRef.current.has(section.id)}
                           >
@@ -694,6 +799,12 @@ export default function ChatConversation() {
           </section>
         );
       })}
+      </div>
+      <div className="aero-statusbar">
+        <span>Ready</span>
+        <span>{chatSections[activeSlide]?.navLabel}</span>
+      </div>
+      </div>
     </div>
   );
 }

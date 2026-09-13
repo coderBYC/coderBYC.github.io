@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import TerminalIntro from "./TerminalIntro";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import ChatConversation from "./ChatConversation";
+import StylePicker from "./StylePicker";
+import TerminalIntro from "./TerminalIntro";
+import { applyStyle, loadStyle } from "@/lib/theme";
 
 const INTRO_SEEN_KEY = "bryan-website-terminal-intro-seen-at";
 const RECENT_MS = 1000 * 60 * 60 * 24;
@@ -11,56 +13,77 @@ const RECENT_MS = 1000 * 60 * 60 * 24;
 function hasSeenIntroRecently() {
   const seenAt = localStorage.getItem(INTRO_SEEN_KEY);
   if (!seenAt) return false;
-
   const timestamp = Number(seenAt);
   if (Number.isNaN(timestamp)) return true;
-
   return Date.now() - timestamp < RECENT_MS;
 }
 
+type Gate = "boot" | "pick" | "chat";
+
 export default function PageContent() {
-  const [showIntro, setShowIntro] = useState<boolean | null>(null);
-  const [skipIntroAnimation, setSkipIntroAnimation] = useState(false);
+  const [gate, setGate] = useState<Gate | null>(null);
+  const [styleOpen, setStyleOpen] = useState(false);
 
   useEffect(() => {
-    const seenRecently = hasSeenIntroRecently();
-    setSkipIntroAnimation(seenRecently);
-    setShowIntro(!seenRecently);
+    const saved = loadStyle();
+    if (saved) applyStyle(saved);
+
+    const seen = hasSeenIntroRecently();
+    if (!saved) {
+      setGate(seen ? "pick" : "boot");
+      return;
+    }
+
+    setGate(seen ? "chat" : "boot");
   }, []);
 
   useEffect(() => {
-    if (showIntro === null) return;
-    document.body.style.overflow = showIntro ? "hidden" : "";
+    if (gate === null) return;
+    document.body.style.overflow = gate === "chat" && !styleOpen ? "" : "hidden";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showIntro]);
+  }, [gate, styleOpen]);
 
-  const handleIntroComplete = () => {
+  const finishIntro = () => {
     localStorage.setItem(INTRO_SEEN_KEY, String(Date.now()));
-    setShowIntro(false);
+    setGate("chat");
+    setStyleOpen(false);
   };
 
-  if (showIntro === null) {
+  if (gate === null) {
     return <div className="fixed inset-0 bg-white" aria-hidden />;
   }
 
   return (
     <>
       <AnimatePresence>
-        {showIntro && <TerminalIntro onComplete={handleIntroComplete} />}
+        {gate === "boot" && (
+          <TerminalIntro
+            onComplete={() => {
+              if (!loadStyle()) {
+                setGate("pick");
+                return;
+              }
+              finishIntro();
+            }}
+          />
+        )}
+        {(gate === "pick" || styleOpen) && (
+          <StylePicker
+            canDismiss={styleOpen}
+            onDismiss={() => setStyleOpen(false)}
+            onComplete={() => {
+              if (gate === "pick") finishIntro();
+              else setStyleOpen(false);
+            }}
+          />
+        )}
       </AnimatePresence>
 
-      <motion.div
-        initial={{ opacity: skipIntroAnimation ? 1 : 0 }}
-        animate={{ opacity: showIntro ? 0 : 1 }}
-        transition={{
-          duration: skipIntroAnimation ? 0 : 0.6,
-          ease: [0.25, 0.1, 0.25, 1],
-        }}
-      >
-        {!showIntro && <ChatConversation />}
-      </motion.div>
+      {gate === "chat" && (
+        <ChatConversation onOpenStylePicker={() => setStyleOpen(true)} />
+      )}
     </>
   );
 }

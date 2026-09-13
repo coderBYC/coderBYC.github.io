@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cardo } from "next/font/google";
+import { Cardo, Nunito, VT323 } from "next/font/google";
 import "./globals.css";
 
 const cardo = Cardo({
@@ -7,6 +7,20 @@ const cardo = Cardo({
   weight: ["400", "700"],
   style: ["normal", "italic"],
   variable: "--font-cardo",
+  display: "swap",
+});
+
+const retro = VT323({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-retro",
+  display: "swap",
+});
+
+const aero = Nunito({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-aero",
   display: "swap",
 });
 
@@ -39,8 +53,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${cardo.variable} h-full scroll-smooth`}>
+    <html
+      lang="en"
+      className={`${cardo.variable} ${retro.variable} ${aero.variable} h-full scroll-smooth`}
+      suppressHydrationWarning
+    >
       <body className="min-h-full bg-white font-serif font-bold text-black antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("bryan-website-style");if(t==="brutalist"||t==="retro"||t==="aero")document.documentElement.dataset.theme=t;}catch(e){}`,
+          }}
+        />
         {children}
       </body>
     </html>

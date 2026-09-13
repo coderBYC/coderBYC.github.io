@@ -29,12 +29,6 @@ export const chatSections: ChatSectionConfig[] = [
     navLabel: "Projects",
   },
   {
-    id: "art",
-    question: "Do you make art?",
-    introText: "Here are some of my artworks — titles coming soon.",
-    navLabel: "Art",
-  },
-  {
     id: "contact",
     question: "How can I contact you?",
     introText: "Here is my contact information:",
