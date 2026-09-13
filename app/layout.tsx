@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cardo, Nunito, VT323 } from "next/font/google";
+import { Cardo, Noto_Sans, VT323 } from "next/font/google";
 import "./globals.css";
 
 const cardo = Cardo({
@@ -17,9 +17,9 @@ const retro = VT323({
   display: "swap",
 });
 
-const aero = Nunito({
+const aero = Noto_Sans({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "600", "700"],
   variable: "--font-aero",
   display: "swap",
 });

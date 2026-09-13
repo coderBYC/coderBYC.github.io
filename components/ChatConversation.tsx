@@ -236,6 +236,9 @@ export default function ChatConversation({
   const promptIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const launchIconRef = useRef<HTMLDivElement>(null);
+  const [opening, setOpening] = useState(false);
   const promptStartedRef = useRef<Set<number>>(new Set());
   const knownVisitedRef = useRef<Set<string>>(new Set());
   const restoredVisitedRef = useRef<Set<string>>(new Set());
@@ -555,6 +558,36 @@ export default function ChatConversation({
   }, [runAutoSequence, clearTimers]);
 
   useEffect(() => {
+    if (theme !== "aero" || !hydrated) return;
+    const frame = frameRef.current;
+    const icon = launchIconRef.current;
+    if (!frame || !icon) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frameId = 0;
+    const start = (tries = 0) => {
+      const frameRect = frame.getBoundingClientRect();
+      const iconRect = icon.getBoundingClientRect();
+      if ((iconRect.width === 0 || frameRect.width === 0) && tries < 8) {
+        frameId = window.requestAnimationFrame(() => start(tries + 1));
+        return;
+      }
+      const x = iconRect.left + iconRect.width / 2 - frameRect.left;
+      const y = iconRect.top + iconRect.height / 2 - frameRect.top;
+      frame.style.setProperty("--aero-origin-x", `${x}px`);
+      frame.style.setProperty("--aero-origin-y", `${y}px`);
+      setOpening(true);
+    };
+
+    frameId = window.requestAnimationFrame(() => start());
+    const timer = window.setTimeout(() => setOpening(false), 720);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(timer);
+    };
+  }, [theme, hydrated]);
+
+  useEffect(() => {
     const syncTheme = () => {
       const next = (document.documentElement.dataset.theme ??
         "brutalist") as SiteStyle;
@@ -636,21 +669,38 @@ export default function ChatConversation({
       className="chat-root fixed inset-0 overflow-y-auto snap-y snap-mandatory bg-white overscroll-none"
     >
       <div className="theme-wallpaper" aria-hidden />
-      <div className="aero-frame">
+      <div className="aero-desktop" aria-hidden>
+        <div
+          ref={launchIconRef}
+          className={`aero-icon${opening ? " is-source" : ""}`}
+        >
+          <img src="/themes/icon-ie.png" alt="" />
+          <span>Internet Explorer</span>
+        </div>
+        <div className="aero-icon">
+          <img src="/themes/icon-explorer.png" alt="" />
+          <span>Explorer</span>
+        </div>
+        <div className="aero-icon">
+          <img src="/themes/icon-cmd.png" alt="" />
+          <span>Command Prompt</span>
+        </div>
+      </div>
+      <div
+        ref={frameRef}
+        className={`aero-frame${opening ? " is-opening" : ""}`}
+      >
       <div className="aero-titlebar">
-        <span className="aero-title">coderBYC — Portfolio</span>
-        <span className="aero-controls">
-          <span className="aero-btn min" aria-hidden>—</span>
-          <span className="aero-btn max" aria-hidden>□</span>
+        <div className="aero-title">Bryan Chen</div>
+        <div className="aero-controls">
+          <button type="button" className="aero-btn min" aria-label="Minimize" />
           <button
             type="button"
             className="aero-btn close"
             onClick={onOpenStylePicker}
             aria-label="Change style"
-          >
-            ×
-          </button>
-        </span>
+          />
+        </div>
       </div>
       <div className="aero-menubar" role="menubar">
         {chatSections.map((section, index) => (
@@ -728,6 +778,7 @@ export default function ChatConversation({
             ref={(el) => {
               slideRefs.current[index] = el;
             }}
+            data-section={section.id}
             data-active={isActive ? "true" : "false"}
             className="flex h-screen snap-start snap-always flex-col bg-white"
             aria-hidden={!isActive && section.phase === "idle"}
