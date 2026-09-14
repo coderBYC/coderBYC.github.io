@@ -107,7 +107,8 @@ export const projects: Project[] = [
     title: "AI Quiz Generator",
     url: "https://www.producthunt.com/products/ai-quiz-generator-3?launch=ai-quiz-generator-3",
     date: "2025. June — 2025. Sep",
-    description: "Turn textbook into quizzes. My first project.",
+    description:
+      "I built a web app that turns PDF textbooks, slides, or worksheets into multiple-choice exercise questions. Though it's a GPT wrapper, it's my first software project.",
     tech: ["JavaScript", "Python", "OpenAI API"],
     icon: "/projects/ai-quiz-generator.png",
   },

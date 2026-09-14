@@ -31,6 +31,27 @@ export interface ProjectPhase {
   }[];
 }
 
+export const projectShots: Record<string, ProjectStepImage[]> = {
+  "ai-quiz-generator": [
+    {
+      src: "/projects/ai-quiz-heatmap.jpg",
+      alt: "AI Quiz Generator dashboard with a learning heatmap and weekly score trend",
+      caption: "A built-in heatmap tracks your learning goals.",
+    },
+    {
+      src: "/projects/ai-quiz-config.jpg",
+      alt: "Quiz configuration screen for choosing question count and difficulty",
+      caption:
+        "You can customize quiz difficulty and how many questions you want.",
+    },
+    {
+      src: "/projects/ai-quiz-scores.jpg",
+      alt: "Quiz list showing a score for each quiz",
+      caption: "See your scores for each quiz.",
+    },
+  ],
+};
+
 export const projectPhases: Record<string, ProjectPhase[]> = {
   "cortex-memory": [
     {

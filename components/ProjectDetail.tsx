@@ -3,7 +3,7 @@ import { FiExternalLink, FiGithub } from "react-icons/fi";
 import TechPill from "@/components/TechPill";
 import ProjectPhaseContent from "@/components/ProjectPhaseContent";
 import type { Project } from "@/lib/data";
-import type { ProjectPhase } from "@/lib/project-content";
+import { projectShots, type ProjectPhase } from "@/lib/project-content";
 
 export default function ProjectDetail({
   project,
@@ -88,6 +88,26 @@ export default function ProjectDetail({
           )}
         </div>
       </article>
+
+      {projectShots[project.id]?.map((shot) => (
+        <figure
+          key={shot.src}
+          className="mt-8 border-2 border-black bg-white p-4 shadow-[8px_8px_0_0_#000] md:p-6"
+        >
+          <Image
+            src={shot.src}
+            alt={shot.alt}
+            width={1024}
+            height={600}
+            className="h-auto w-full border-2 border-black object-contain"
+          />
+          {shot.caption && (
+            <figcaption className="mt-4 text-base leading-relaxed text-black/70">
+              {shot.caption}
+            </figcaption>
+          )}
+        </figure>
+      ))}
 
       {phases?.map((phase) => (
         <div

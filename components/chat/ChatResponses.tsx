@@ -67,7 +67,7 @@ export function EducationResponse() {
           />
           <div>
             <p className="text-lg font-bold text-black/90">
-              Affiliated High School of NTNU
+              Affiliated High School of NTNU (2022-2025)
             </p>
             <p className="mt-1">#2 best high school in Taipei.</p>
             <p>Programming Club</p>

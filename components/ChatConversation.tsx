@@ -34,6 +34,10 @@ function isScenicTheme(theme: string) {
   return theme === "retro" || theme === "aero";
 }
 
+function showsWeather(theme: string) {
+  return theme === "aero";
+}
+
 interface SectionState {
   id: string;
   question: string;
@@ -447,6 +451,7 @@ export default function ChatConversation({
   const goToSlide = useCallback(
     (index: number) => {
       if (index < 0 || index >= chatSections.length) return;
+      if (chatSections[index]?.id === "weather" && !showsWeather(themeRef.current)) return;
 
       setPromptBar(null);
       if (promptIntervalRef.current) {
@@ -470,7 +475,8 @@ export default function ChatConversation({
 
   const handleContentComplete = useCallback(
     (index: number) => {
-      if (index >= chatSections.length - 1) return;
+      const next = chatSections[index + 1];
+      if (!next || (next.id === "weather" && !showsWeather(themeRef.current))) return;
       if (promptStartedRef.current.has(index)) return;
       promptStartedRef.current.add(index);
 
@@ -480,7 +486,7 @@ export default function ChatConversation({
         : false;
 
       if (alreadySeen) {
-        const question = chatSections[index + 1]?.question;
+        const question = next.question;
         if (!question) return;
         setPromptBar({
           hostSlideIndex: index,
@@ -529,9 +535,14 @@ export default function ChatConversation({
       knownVisitedRef.current = new Set(visit.visitedIds);
       restoredVisitedRef.current = new Set(visit.visitedIds);
       const lastIndex = chatSections.length - 1;
+      const weatherIndex = chatSections.findIndex((section) => section.id === "weather");
+      const restoredActive =
+        visit.activeSlide === weatherIndex ? Math.max(0, weatherIndex - 1) : visit.activeSlide;
       setSections(createInitialSections(visit.visitedIds));
-      setActiveSlide(Math.min(visit.activeSlide, lastIndex));
-      setMaxUnlockedSlide(Math.min(visit.maxUnlocked, lastIndex));
+      const restoredMax =
+        visit.maxUnlocked >= weatherIndex ? Math.max(0, weatherIndex - 1) : visit.maxUnlocked;
+      setActiveSlide(Math.min(restoredActive, lastIndex));
+      setMaxUnlockedSlide(Math.min(restoredMax, lastIndex));
 
       const visitedIndexes = visit.visitedIds
         .map((id) => chatSections.findIndex((section) => section.id === id))
@@ -548,7 +559,8 @@ export default function ChatConversation({
         : 0;
 
       if (lastVisitedIndex < chatSections.length - 1) {
-        const question = chatSections[lastVisitedIndex + 1]?.question;
+        const next = chatSections[lastVisitedIndex + 1];
+        const question = next?.id === "weather" ? undefined : next?.question;
         if (question) {
           setPromptBar({
             hostSlideIndex: lastVisitedIndex,
@@ -562,7 +574,7 @@ export default function ChatConversation({
       setHydrated(true);
       requestAnimationFrame(() => {
         if (isScenicTheme(document.documentElement.dataset.theme ?? "")) return;
-        slideRefs.current[visit.activeSlide]?.scrollIntoView({
+        slideRefs.current[Math.min(restoredActive, lastIndex)]?.scrollIntoView({
           behavior: "auto",
         });
       });
@@ -610,7 +622,14 @@ export default function ChatConversation({
         "brutalist") as SiteStyle;
       themeRef.current = next;
       setTheme(next);
-      if (next !== "aero") setOpenProjectId(null);
+      if (next !== "aero") {
+        setOpenProjectId(null);
+        if (!showsWeather(next)) {
+          setActiveSlide((current) =>
+            chatSections[current]?.id === "weather" ? Math.max(0, current - 1) : current
+          );
+        }
+      }
       if (!isScenicTheme(next)) return;
 
       setMaxUnlockedSlide(chatSections.length - 1);
@@ -730,17 +749,19 @@ export default function ChatConversation({
         </div>
       </div>
       <div className="aero-menubar" role="menubar">
-        {chatSections.map((section, index) => (
-          <button
-            key={section.id}
-            type="button"
-            role="menuitem"
-            onClick={() => goToSlide(index)}
-            className={activeSlide === index ? "is-active" : ""}
-          >
-            {section.navLabel}
-          </button>
-        ))}
+        {chatSections.map((section, index) =>
+          section.id === "weather" && !showsWeather(theme) ? null : (
+            <button
+              key={section.id}
+              type="button"
+              role="menuitem"
+              onClick={() => goToSlide(index)}
+              className={activeSlide === index ? "is-active" : ""}
+            >
+              {section.navLabel}
+            </button>
+          )
+        )}
         <button
           type="button"
           className="ml-auto"
@@ -752,6 +773,7 @@ export default function ChatConversation({
       <nav className="site-nav pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4 md:px-6">
         <div className="pointer-events-auto flex max-w-3xl flex-wrap items-center justify-center gap-1 rounded-full border-2 border-black bg-white/95 px-2 py-1.5 shadow-[3px_3px_0_0_#000] backdrop-blur-sm">
           {chatSections.map((section, index) => {
+            if (section.id === "weather" && !showsWeather(theme)) return null;
             const isActive = activeSlide === index;
             return (
               <button
@@ -780,6 +802,7 @@ export default function ChatConversation({
       <div className="aero-client">
 
       {sections.map((section, index) => {
+        if (section.id === "weather" && !showsWeather(theme)) return null;
         const showQuestion =
           section.phase === "typing" ||
           section.phase === "sent" ||
